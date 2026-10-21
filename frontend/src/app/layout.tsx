@@ -37,7 +37,10 @@ export default function RootLayout({
       lang="id"
       className={`scroll-smooth scroll-pt-20 ${plusJakartaSans.variable} ${playfairDisplay.variable} ${jetbrainsMono.variable}`}
     >
-      <body className="min-h-screen bg-background font-sans text-foreground antialiased">
+      <body
+        suppressHydrationWarning
+        className="min-h-screen bg-background font-sans text-foreground antialiased"
+      >
         {children}
         <Toaster position="top-right" richColors />
       </body>
