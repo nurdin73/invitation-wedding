@@ -76,8 +76,8 @@ export function LandingHowItWorks() {
         </div>
 
         {/* Horizontal Timeline Track */}
-        <div className="mt-16">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10">
+        <div className="mt-12 sm:mt-16">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8 lg:gap-10">
             {TIMELINE_STEPS.map((item, index) => {
               const Icon = item.icon;
               const isLast = index === TIMELINE_STEPS.length - 1;
@@ -96,8 +96,8 @@ export function LandingHowItWorks() {
                     />
                   )}
 
-                  {/* Step Milestone Node */}
-                  <div className="relative z-10 flex h-14 w-14 items-center justify-center rounded-2xl border-2 border-primary bg-card text-primary shadow-sm shrink-0 transition-transform duration-200 group-hover:scale-105">
+                  {/* Step Milestone Node (Hidden on Mobile, Visible on Desktop md:flex) */}
+                  <div className="hidden md:flex relative z-10 h-14 w-14 items-center justify-center rounded-2xl border-2 border-primary bg-card text-primary shadow-sm shrink-0 transition-transform duration-200 group-hover:scale-105">
                     <Icon className="h-6 w-6" />
                     <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-mono font-bold text-primary-foreground shadow-xs">
                       {item.step}
@@ -105,12 +105,19 @@ export function LandingHowItWorks() {
                   </div>
 
                   {/* Step Card Content */}
-                  <div className="mt-6 w-full rounded-3xl border border-border bg-card p-6 sm:p-7 shadow-xs transition-all duration-200 group-hover:border-primary/40 group-hover:shadow-md flex flex-col justify-between flex-1 text-left">
+                  <div className="mt-0 md:mt-6 w-full rounded-3xl border border-border bg-card p-6 sm:p-7 shadow-xs transition-all duration-200 group-hover:border-primary/40 group-hover:shadow-md flex flex-col justify-between flex-1 text-left">
                     <div>
-                      {/* Tag Badge */}
-                      <div className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-primary mb-2">
-                        <Sparkles className="h-3 w-3" />
-                        <span>{item.tag}</span>
+                      {/* Tag Badge & Mobile Step Indicator */}
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
+                          <Sparkles className="h-3 w-3" />
+                          <span>{item.tag}</span>
+                        </div>
+
+                        {/* Compact Step Badge (Mobile Only) */}
+                        <span className="md:hidden flex h-6 px-2.5 items-center justify-center rounded-full bg-accent-tint text-primary font-mono text-[11px] font-bold border border-border-soft">
+                          {item.step}
+                        </span>
                       </div>
 
                       {/* Step Title */}
@@ -130,14 +137,6 @@ export function LandingHowItWorks() {
                       <span>{item.featurePill}</span>
                     </div>
                   </div>
-
-                  {/* Mobile Vertical Connecting Line Between Steps */}
-                  {!isLast && (
-                    <div
-                      className="md:hidden w-0.5 h-6 border-l-2 border-dashed border-primary/30 my-2"
-                      aria-hidden="true"
-                    />
-                  )}
                 </div>
               );
             })}

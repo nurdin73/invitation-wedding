@@ -102,9 +102,9 @@ export function LandingHero() {
             </div>
           </div>
 
-          {/* RIGHT COLUMN: Mobile Chassis Wireframe Placeholder */}
+          {/* RIGHT COLUMN: Mobile Chassis Wireframe Placeholder (Hidden on Mobile, Visible on Desktop lg:flex) */}
           <div
-            className="relative flex items-center justify-center lg:col-span-5"
+            className="relative hidden items-center justify-center lg:col-span-5 lg:flex"
             data-testid="landing-hero-mockup-col"
           >
             {/* Ambient Backlight Glow */}
