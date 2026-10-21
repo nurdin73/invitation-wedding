@@ -4,6 +4,7 @@ import * as React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import { siteConfig } from '@/config/site';
 
 export default function DashboardLayout({
   children,
@@ -30,7 +31,7 @@ export default function DashboardLayout({
         <div className="container mx-auto flex h-14 items-center justify-between px-4 sm:px-6">
           <div className="flex items-center gap-6">
             <Link href="/dashboard" className="font-semibold text-foreground tracking-tight">
-              💍 Wedding SaaS
+              💍 {siteConfig.name}
             </Link>
             <nav className="flex items-center gap-4">
               {navItems.map((item) => {

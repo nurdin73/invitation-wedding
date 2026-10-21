@@ -2,6 +2,7 @@ import React from 'react';
 import { notFound } from 'next/navigation';
 import { publicApi } from '@/services/api/public.api';
 import { generateCanvasStyleVars } from '@/lib/style-helpers';
+import { siteConfig } from '@/config/site';
 
 interface GuestPageProps {
   params: Promise<{ slug: string }>;
@@ -49,7 +50,7 @@ export default async function GuestPage({ params }: GuestPageProps) {
       </div>
 
       <div className="py-6 border-t border-slate-100 text-xs text-slate-400">
-        Dibuat dengan cinta via Wedding Invitation SaaS
+        Dibuat dengan cinta via {siteConfig.name}
       </div>
     </div>
   );

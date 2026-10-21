@@ -13,9 +13,16 @@ const config: Config = {
       colors: {
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
+        border: {
+          DEFAULT: 'hsl(var(--border))',
+          soft: 'hsl(var(--border-soft))',
+        },
+        input: 'hsl(var(--input))',
+        ring: 'hsl(var(--ring))',
         card: {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
+          oat: 'hsl(var(--card-oat))',
         },
         popover: {
           DEFAULT: 'hsl(var(--popover))',
@@ -32,18 +39,22 @@ const config: Config = {
         muted: {
           DEFAULT: 'hsl(var(--muted))',
           foreground: 'hsl(var(--muted-foreground))',
+          caption: 'hsl(var(--muted-caption))',
         },
         accent: {
           DEFAULT: 'hsl(var(--accent))',
           foreground: 'hsl(var(--accent-foreground))',
+          tint: 'hsl(var(--accent-tint))',
+          gold: 'hsl(var(--accent-gold))',
+        },
+        success: {
+          DEFAULT: 'hsl(var(--success))',
+          foreground: 'hsl(var(--success-foreground))',
         },
         destructive: {
           DEFAULT: 'hsl(var(--destructive))',
           foreground: 'hsl(var(--destructive-foreground))',
         },
-        border: 'hsl(var(--border))',
-        input: 'hsl(var(--input))',
-        ring: 'hsl(var(--ring))',
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -52,6 +63,8 @@ const config: Config = {
       },
       fontFamily: {
         sans: ['var(--font-sans)', 'Plus Jakarta Sans', 'Inter', 'sans-serif'],
+        heading: ['var(--font-heading)', 'Playfair Display', 'serif'],
+        serif: ['var(--font-heading)', 'Playfair Display', 'serif'],
         mono: ['var(--font-mono)', 'JetBrains Mono', 'monospace'],
       },
     },

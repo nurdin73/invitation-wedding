@@ -40,40 +40,48 @@ The platform operates across two completely separate visual domains that must re
 
 All platform interface styling (Landing, Auth, Dashboard, Editor Chrome) must strictly utilize the standardized semantic color tokens defined below.
 
-### A. Semantic Token Mapping Table
+### A. Semantic Token Mapping Table (Editorial Color Palette)
 
 | Token Name | Light Mode (HEX) | Dark Mode (HEX) | Functional Role |
 | :--- | :--- | :--- | :--- |
-| **`primary`** | `#4F46E5` (Indigo-600) | `#6366F1` (Indigo-500) | Primary CTA buttons, active publish action, active canvas section selection ring, focus indicators. |
-| **`primary-foreground`** | `#FFFFFF` | `#FFFFFF` | Text and icons placed on top of `primary` elements. |
-| **`secondary`** | `#F1F5F9` (Slate-100) | `#1E293B` (Slate-800) | Secondary buttons, menu item hover backgrounds, category filter badges. |
-| **`secondary-foreground`** | `#0F172A` (Slate-900) | `#F8FAFC` (Slate-50) | Text placed on top of `secondary` elements. |
-| **`background`** | `#F8FAFC` (Slate-50) | `#0B0F19` (Zinc-950) | Dashboard base background and gray workspace surrounding the editor canvas. |
-| **`surface` / `card`** | `#FFFFFF` | `#111827` (Gray-900) | Sidebar navigation, topbar toolbar, modal dialogs, summary cards, device mockup chassis. |
-| **`surface-muted`** | `#F1F5F9` (Slate-100) | `#1F2937` (Gray-800) | Input fields, preview boxes, inactive tab strips, secondary list rows. |
-| **`border`** | `#E2E8F0` (Slate-200) | `#374151` (Gray-700) | Panel dividers, table borders, input borders, structural separators. |
-| **`text-primary`** | `#0F172A` (Slate-900) | `#F9FAFB` (Gray-50) | High-contrast page titles, section headers, critical form labels. |
-| **`text-secondary`** | `#64748B` (Slate-500) | `#9CA3AF` (Gray-400) | Helper text, descriptions, timestamps, input placeholders. |
-| **`accent`** | `#06B6D4` (Cyan-500) | `#22D3EE` (Cyan-400) | Visual accents, onboarding highlights, "New" feature badges. |
-| **`success`** | `#10B981` (Emerald-500)| `#34D399` (Emerald-400)| Auto-save badge (`Saved`), active subscription tag, successful payment alerts. |
-| **`warning`** | `#F59E0B` (Amber-500)  | `#FBBF24` (Amber-400)  | Pending checkout status, storage limit warnings, unsaved changes alert. |
-| **`destructive`** | `#EF4444` (Red-500)  | `#F87171` (Red-400)    | Delete section action, subscription cancel, error messages, form invalid state. |
+| **`primary` / `accent`** | `#B86B70` (Dusty Rose) | `#D48D92` (Muted Dusty Rose) | Primary CTA buttons, key action highlights, canvas section selection ring, focus indicators. |
+| **`primary-foreground`** | `#FFFFFF` (Crisp White) | `#FFFFFF` | Text and icons placed on top of `primary` elements. |
+| **`background`** | `#FAF8F5` (Warm Linen Cream) | `#1C1715` (Deep Espresso) | Base background across dashboard, landing, and workspace chassis. |
+| **`card` / `surface`** | `#FFFFFF` (Crisp White) | `#231E1B` (Dark Cocoa Card) | Primary cards, modal dialogs, topbars, device mockup chassis. |
+| **`card-oat` / `secondary`** | `#F5EFEB` (Off-White Oat) | `#2C2522` (Muted Oat Dark) | Secondary cards, preview boxes, inactive tabs, secondary list items. |
+| **`secondary-foreground`** | `#3A302C` (Dark Espresso Charcoal) | `#F5EFEB` (Off-White Oat) | High-contrast text placed on top of `secondary` elements. |
+| **`border`** | `#ECE5DE` (Subtle Oat Line) | `#38302C` (Deep Cocoa Border) | Panel dividers, table borders, card borders, structural separators. |
+| **`border-soft`** | `#F2DFDC` (Soft Blush Line) | `#443534` (Muted Blush Border) | Gentle inner dividers, accent container borders. |
+| **`accent-tint`** | `#FDF0EE` (Soft Rose Tint) | `#382627` (Deep Rose Tint) | Soft badge backgrounds, hero highlight strips, subtle card glow. |
+| **`accent-gold`** | `#DFB15B` (Champagne Sand) | `#DFB15B` (Champagne Sand) | VIP badges, special plan indicators, milestone stars. |
+| **`text-primary` / `foreground`** | `#3A302C` (Dark Espresso Charcoal) | `#FAF8F5` (Warm Linen Cream) | High-contrast page titles, section headers, critical form labels. |
+| **`text-secondary` / `muted-foreground`** | `#73635C` (Soft Cocoa) | `#C4B6AF` (Light Cocoa) | Body text, descriptions, timestamps, secondary navigation. |
+| **`muted-caption`** | `#A89B95` (Warm Stone) | `#8E807A` (Muted Stone) | Micro-copy, footnotes, input placeholders, caption text. |
+| **`success`** | `#E8F0EA` (Soft Sage) | `#233427` (Muted Sage Dark) | Success badge backgrounds, positive status indicators. |
+| **`success-foreground`** | `#58755E` (Sage Dark) | `#8EB095` (Light Sage) | High-contrast text/icons on success badges. |
+| **`destructive`** | `#DC2626` (Red-600) | `#EF4444` (Red-500) | Delete section action, error alerts, form invalid state. |
+| **`destructive-foreground`**| `#FFFFFF` | `#FFFFFF` | Text on destructive elements. |
 
 ### B. Prohibited Color Anti-Patterns
-- **No Hardcoded Hex/RGB:** Never use arbitrary hex codes (e.g. `bg-[#4F46E5]`, `text-[#0F172A]`) or raw RGB values in component templates. Always use semantic Tailwind classes (`bg-primary`, `text-foreground`, `border-border`, `bg-muted`).
+- **No Hardcoded Hex/RGB:** Never use arbitrary hex codes (e.g. `bg-[#1E293B]`, `text-[#C5A880]`) or raw RGB values in component templates. Always use semantic Tailwind classes (`bg-primary`, `text-foreground`, `border-border`, `bg-muted`, `bg-accent`).
 - **No Generic Tailwind Colors:** Avoid scattered ad-hoc colors (e.g. `bg-blue-500`, `text-green-600`) for standard UI states. Use `text-success`, `text-warning`, `text-destructive`.
 
 ---
 
 ## 3. Typography System & Hierarchy (Platform Web)
 
-Platform UI typography is strictly modern sans-serif with a high-legibility monospace pairing:
+Platform UI typography follows a refined Two-Font pairing: an editorial serif for headings paired with a clean modern sans-serif for body/controls, backed by monospace for data tokens:
 
 ### A. Font Families
-1. **Primary UI Font (Headings, Controls & Body):** `Plus Jakarta Sans`
+1. **Heading Font (Titles & Main Section Headers):** `Playfair Display`
+   - Fallback stack: `Georgia, "Times New Roman", serif`
+   - Loaded via `next/font/google` and configured in root layout and Tailwind via `font-heading` / `font-serif`.
+   - **Scope Guardrail:** Hanya diterapkan untuk `h1` dan `h2`.
+2. **Body, Subheadings & Controls Font (H3–H6, Body, Buttons, Inputs, Labels):** `Plus Jakarta Sans`
    - Fallback stack: `Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`
-   - Configured in root layout and Tailwind via `font-sans`.
-2. **Monospace Font (Data & Technical Tokens):** `JetBrains Mono` or `Geist Mono`
+   - Loaded via `next/font/google` and configured in root layout and Tailwind via `font-sans`.
+   - **Scope Guardrail:** Seluruh elemen selain `h1` dan `h2` (termasuk `h3`, `h4`, `h5`, `h6`, kartu, dan kontrol) wajib menggunakan `Plus Jakarta Sans`.
+3. **Monospace Font (Data & Technical Tokens):** `JetBrains Mono` or `Geist Mono`
    - Used for: Slug URLs (`/[slug]`), API tokens, payment transaction IDs, and HEX color inputs in the inspector.
    - Configured in Tailwind via `font-mono`.
 

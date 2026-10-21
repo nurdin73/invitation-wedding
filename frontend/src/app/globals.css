@@ -2,48 +2,89 @@
 @config "../../tailwind.config.ts";
 
 :root {
-  --background: 210 40% 98%;
-  --foreground: 222.2 84% 4.9%;
+  /* EDITORIAL COLOR PALETTE */
+  /* Base Background: Warm Linen Cream (#FAF8F5) */
+  --background: 36 33.3% 97.1%;
+  /* Primary Text: Dark Espresso Charcoal (#3A302C) */
+  --foreground: 17 13.7% 20%;
+
+  /* Surface Card Pure: Crisp White (#FFFFFF) */
   --card: 0 0% 100%;
-  --card-foreground: 222.2 84% 4.9%;
+  --card-foreground: 17 13.7% 20%;
+  /* Surface Card Oat: Off-White Oat (#F5EFEB) */
+  --card-oat: 24 33.3% 94.1%;
+
   --popover: 0 0% 100%;
-  --popover-foreground: 222.2 84% 4.9%;
-  --primary: 243.4 75.4% 58.6%;
-  --primary-foreground: 210 40% 98%;
-  --secondary: 210 40% 96.1%;
-  --secondary-foreground: 222.2 47.4% 11.2%;
-  --muted: 210 40% 96.1%;
-  --muted-foreground: 215.4 16.3% 46.9%;
-  --accent: 188.7 94.5% 42.7%;
-  --accent-foreground: 222.2 47.4% 11.2%;
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 210 40% 98%;
-  --border: 214.3 31.8% 91.4%;
-  --input: 214.3 31.8% 91.4%;
-  --ring: 243.4 75.4% 58.6%;
+  --popover-foreground: 17 13.7% 20%;
+
+  /* Primary Accent: Dusty Rose (#B86B70) */
+  --primary: 356 34.8% 57.1%;
+  --primary-foreground: 0 0% 100%;
+
+  /* Secondary: Off-White Oat (#F5EFEB) */
+  --secondary: 24 33.3% 94.1%;
+  --secondary-foreground: 17 13.7% 20%;
+
+  /* Muted Surface & Body Text: Soft Cocoa (#73635C) */
+  --muted: 24 33.3% 94.1%;
+  --muted-foreground: 18 11.1% 40.6%;
+  /* Muted Text / Captions: Warm Stone (#A89B95) */
+  --muted-caption: 19 10.1% 62.2%;
+
+  /* Accent Tokens */
+  --accent: 356 34.8% 57.1%;           /* Dusty Rose (#B86B70) */
+  --accent-foreground: 0 0% 100%;
+  --accent-tint: 8 75% 96.3%;          /* Soft Rose Tint (#FDF0EE) */
+  --accent-gold: 39 68.8% 61.6%;       /* Champagne Sand (#DFB15B) */
+
+  /* Success Tokens: Soft Sage (#E8F0EA) & Sage Dark (#58755E) */
+  --success: 135 21.6% 92.5%;
+  --success-foreground: 132 14.1% 40.2%;
+
+  /* Destructive */
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+
+  /* Hairline Borders: Main (#ECE5DE) & Soft (#F2DFDC) */
+  --border: 30 25.9% 89.8%;
+  --border-soft: 8 45.8% 90.6%;
+  --input: 30 25.9% 89.8%;
+  --ring: 356 34.8% 57.1%;
   --radius: 0.5rem;
 }
 
 .dark {
-  --background: 222.2 84% 4.9%;
-  --foreground: 210 40% 98%;
-  --card: 222.2 84% 4.9%;
-  --card-foreground: 210 40% 98%;
-  --popover: 222.2 84% 4.9%;
-  --popover-foreground: 210 40% 98%;
-  --primary: 238.7 83.5% 66.7%;
-  --primary-foreground: 222.2 47.4% 11.2%;
-  --secondary: 217.2 32.6% 17.5%;
-  --secondary-foreground: 210 40% 98%;
-  --muted: 217.2 32.6% 17.5%;
-  --muted-foreground: 215 20.2% 65.1%;
-  --accent: 188.7 94.5% 42.7%;
-  --accent-foreground: 210 40% 98%;
-  --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 210 40% 98%;
-  --border: 217.2 32.6% 17.5%;
-  --input: 217.2 32.6% 17.5%;
-  --ring: 238.7 83.5% 66.7%;
+  --background: 17 14% 10%;
+  --foreground: 36 33% 96%;
+  --card: 17 14% 13%;
+  --card-foreground: 36 33% 96%;
+  --card-oat: 17 14% 16%;
+  --popover: 17 14% 13%;
+  --popover-foreground: 36 33% 96%;
+  --primary: 356 38% 65%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 17 14% 18%;
+  --secondary-foreground: 36 33% 96%;
+  --muted: 17 14% 18%;
+  --muted-foreground: 18 12% 65%;
+  --muted-caption: 19 10% 55%;
+  --accent: 356 38% 65%;
+  --accent-foreground: 0 0% 100%;
+  --accent-tint: 356 25% 18%;
+  --accent-gold: 39 60% 60%;
+  --success: 135 15% 20%;
+  --success-foreground: 132 25% 70%;
+  --destructive: 0 62% 40%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 17 14% 20%;
+  --border-soft: 17 14% 24%;
+  --input: 17 14% 20%;
+  --ring: 356 38% 65%;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
 }
 
 * {
@@ -56,3 +97,12 @@ body {
   font-family: var(--font-sans), 'Plus Jakarta Sans', sans-serif;
   -webkit-font-smoothing: antialiased;
 }
+
+h1, h2 {
+  font-family: var(--font-heading), 'Playfair Display', Georgia, serif;
+}
+
+h3, h4, h5, h6 {
+  font-family: var(--font-sans), 'Plus Jakarta Sans', sans-serif;
+}
+

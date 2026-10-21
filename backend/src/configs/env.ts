@@ -1,6 +1,7 @@
 export const env = {
   NODE_ENV: process.env.NODE_ENV || 'development',
   PORT: parseInt(process.env.PORT || '4000', 10),
+  APP_NAME: process.env.APP_NAME || 'plannikah',
   FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:3000',
 
   JWT_SECRET: process.env.JWT_SECRET || 'super_secret_jwt_random_salt_at_least_64_characters_long_for_security_compliance',
