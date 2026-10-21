@@ -27,7 +27,7 @@ const TIMELINE_STEPS: readonly TimelineStep[] = [
     icon: Edit3,
     title: 'Masukkan Jadwal, Lokasi & Foto',
     description:
-      'Tulis nama kedua mempelai, waktu akad dan resepsi, petunjuk arah lokasi acara, nomor rekening hadiah, serta foto kebersamaan Anda.',
+      'Tulis nama kedua mempelai, waktu akad dan resepsi, petunjuk rute lokasi acara, cerita cinta, serta galeri foto kebersamaan Anda.',
     featurePill: 'Bisa diisi dan diubah kapan saja dengan mudah',
   },
   {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layers, UserCheck, Wallet, Music, MapPin, CheckCircle2, ArrowUpDown } from 'lucide-react';
+import { Layers, UserCheck, Wallet, Music, Printer, FileText, CheckCircle2, ArrowUpDown, Download } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 export function LandingFeatures() {
@@ -120,72 +120,111 @@ export function LandingFeatures() {
             </div>
           </div>
 
-          {/* Bento Item 3: Digital Envelope & Bank Account - 6 cols */}
+          {/* Bento Item 3: Digital Envelope & Background Music (Pro Feature) - 6 cols */}
           <div
             className="group relative rounded-3xl border border-border bg-card p-6 sm:p-8 shadow-sm transition-all duration-200 hover:border-primary/40 hover:shadow-md md:col-span-6 flex flex-col justify-between"
             data-testid="landing-feature-bento-envelope"
           >
             <div>
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent-tint text-primary border border-border-soft mb-5">
-                <Wallet className="h-5 w-5" />
+              <div className="flex items-center justify-between mb-5">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent-tint text-primary border border-border-soft">
+                  <Wallet className="h-5 w-5" />
+                </div>
+                <Badge
+                  variant="outline"
+                  className="rounded-full border-primary/30 bg-accent-tint/60 px-2.5 py-0.5 text-[11px] font-semibold text-primary"
+                  data-testid="landing-feature-bento-envelope-badge"
+                >
+                  Paket Pro
+                </Badge>
               </div>
-              <h3 className="text-lg sm:text-xl font-semibold text-foreground tracking-tight">
-                Amplop Digital & Rekening Bank
+
+              <h3 className="text-lg sm:text-xl font-semibold text-foreground tracking-tight font-sans">
+                Amplop Digital & Musik Pilihan
               </h3>
               <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                Sediakan informasi nomor rekening bank atau dompet digital agar tamu undangan dapat mengirimkan tanda kasih dengan mudah dan aman.
+                Fasilitasi tanda kasih melalui rekening bank & dompet digital serta hadirkan musik latar romantis otomatis untuk menyempurnakan suasana.
               </p>
             </div>
 
-            {/* Micro Card Snapshot */}
-            <div className="mt-6 rounded-2xl border border-border-soft bg-accent-tint/40 p-4 flex items-center justify-between">
-              <div className="space-y-0.5">
-                <span className="text-[10px] uppercase tracking-wider text-muted-caption font-semibold">Tanda Kasih Digital</span>
-                <p className="text-xs font-semibold text-foreground">BCA / Mandiri / BSI & E-Wallet</p>
+            {/* Micro Card Snapshot: Envelope & Music */}
+            <div className="mt-6 space-y-2.5">
+              <div className="rounded-2xl border border-border-soft bg-accent-tint/40 p-3.5 flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <span className="text-[10px] uppercase tracking-wider text-muted-caption font-semibold">Tanda Kasih Digital</span>
+                  <p className="text-xs font-semibold text-foreground">BCA / Mandiri / BSI & E-Wallet</p>
+                </div>
+                <span className="rounded-lg bg-card px-2.5 py-1 text-xs font-medium text-primary border border-border shadow-2xs">
+                  Salin Rekening
+                </span>
               </div>
-              <span className="rounded-lg bg-card px-3 py-1 text-xs font-medium text-primary border border-border shadow-2xs">
-                Salin No. Rekening
-              </span>
+
+              <div className="rounded-2xl border border-border bg-background/80 p-3 flex items-center justify-between">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-accent-tint text-primary shrink-0">
+                    <Music className="h-3.5 w-3.5" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-medium text-foreground truncate">A Thousand Years</p>
+                    <p className="text-[10px] text-muted-caption">Bebas Pilih Lagu Favorit</p>
+                  </div>
+                </div>
+                <span className="text-[10px] font-medium text-primary bg-accent-tint px-2 py-0.5 rounded-md">
+                  Autoplay
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* Bento Item 4: Background Music & Maps - 6 cols */}
+          {/* Bento Item 4: Bonus Desain Undangan Fisik Siap Cetak (PDF) - 6 cols */}
           <div
             className="group relative rounded-3xl border border-border bg-card p-6 sm:p-8 shadow-sm transition-all duration-200 hover:border-primary/40 hover:shadow-md md:col-span-6 flex flex-col justify-between"
-            data-testid="landing-feature-bento-music-maps"
+            data-testid="landing-feature-bento-print-design"
           >
             <div>
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent-tint text-primary border border-border-soft mb-5">
-                <Music className="h-5 w-5" />
+              <div className="flex items-center justify-between mb-5">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent-tint text-primary border border-border-soft">
+                  <Printer className="h-5 w-5" />
+                </div>
+                <Badge
+                  variant="outline"
+                  className="rounded-full border-primary/30 bg-accent-tint/60 px-2.5 py-0.5 text-[11px] font-semibold text-primary"
+                  data-testid="landing-feature-bento-print-badge"
+                >
+                  Bonus Paket Pro
+                </Badge>
               </div>
-              <h3 className="text-lg sm:text-xl font-semibold text-foreground tracking-tight">
-                Musik Latar & Navigasi Lokasi
+
+              <h3 className="text-lg sm:text-xl font-semibold text-foreground tracking-tight font-sans">
+                Bonus Desain Fisik Siap Cetak
               </h3>
               <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                Hadirkan alunan lagu romantis otomatis serta navigasi satu sentuhan ke Google Maps agar para tamu dapat menemukan tempat acara dengan nyaman.
+                Dapatkan file dokumen PDF resolusi tinggi (300 DPI) siap cetak mandiri di percetakan, dengan desain serasi untuk keluarga sepuh atau tamu kehormatan.
               </p>
             </div>
 
-            {/* Music Player & Maps Snippet */}
-            <div className="mt-6 grid grid-cols-2 gap-3">
-              <div className="rounded-2xl border border-border bg-background/80 p-3 flex items-center gap-2.5">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent-tint text-primary shrink-0">
-                  <Music className="h-4 w-4" />
+            {/* Document Print Snapshot */}
+            <div className="mt-6 rounded-2xl border border-border bg-background/80 p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent-tint text-primary shrink-0">
+                    <FileText className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-foreground">Kartu Undangan Cetak (PDF)</p>
+                    <p className="text-[10px] text-muted-caption">Resolusi 300 DPI • Siap Cetak Percetakan</p>
+                  </div>
                 </div>
-                <div className="min-w-0">
-                  <p className="text-[11px] font-medium text-foreground truncate">A Thousand Years</p>
-                  <p className="text-[10px] text-muted-caption">Autoplay Aktif</p>
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-card border border-border text-primary shadow-xs">
+                  <Download className="h-3.5 w-3.5" />
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-border bg-background/80 p-3 flex items-center gap-2.5">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent-tint text-primary shrink-0">
-                  <MapPin className="h-4 w-4" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-[11px] font-medium text-foreground truncate">Google Maps</p>
-                  <p className="text-[10px] text-muted-caption">Buka Rute Lokasi</p>
-                </div>
+              <div className="pt-2.5 border-t border-border flex items-center justify-between text-[11px] text-muted-caption">
+                <span>Format: PDF Vektor Standar Percetakan</span>
+                <span className="flex items-center gap-1 text-primary font-medium">
+                  <CheckCircle2 className="h-3 w-3" /> Desain Serasi
+                </span>
               </div>
             </div>
           </div>
