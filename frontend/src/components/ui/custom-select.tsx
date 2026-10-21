@@ -20,9 +20,13 @@ export const getSelectClassNames = (
 ): ClassNamesConfig<FormSelectOption, boolean, GroupBase<FormSelectOption>> => ({
   control: (state) =>
     cn(
-      'flex min-h-9 w-full rounded-md border border-border bg-transparent px-2.5 py-0.5 text-sm shadow-sm transition-colors cursor-pointer',
-      state.isFocused && 'ring-1 ring-primary border-primary outline-none',
-      hasError && 'border-destructive ring-destructive focus-within:ring-destructive focus-within:border-destructive',
+      'flex min-h-9 w-full rounded-md border bg-transparent px-2.5 py-0.5 text-sm shadow-sm transition-colors cursor-pointer',
+      hasError
+        ? 'border-destructive ring-1 ring-destructive/30 focus-within:ring-destructive focus-within:border-destructive'
+        : cn(
+            'border-border',
+            state.isFocused && 'ring-1 ring-primary border-primary outline-none'
+          ),
       state.isDisabled && 'cursor-not-allowed opacity-50 bg-secondary/30'
     ),
   placeholder: () => 'text-muted-foreground text-sm font-normal select-none',
