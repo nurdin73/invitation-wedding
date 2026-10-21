@@ -3,81 +3,93 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { Formik, Form } from 'formik';
+import { z } from 'zod';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
+import { FormController } from '@/components/ui/form-controller';
+import { validateWithZod } from '@/lib/zod-formik';
 import { authApi } from '@/services/api/auth.api';
+
+const loginSchema = z.object({
+  email: z
+    .string()
+    .min(1, 'Alamat email wajib diisi.')
+    .email('Format alamat email tidak valid.'),
+  password: z
+    .string()
+    .min(1, 'Kata sandi wajib diisi.')
+    .min(6, 'Kata sandi minimal 6 karakter.'),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  const [isLoading, setIsLoading] = React.useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
+  const handleLoginSubmit = async (values: LoginFormValues) => {
     try {
-      const response = await authApi.login({ email, password });
+      const response = await authApi.login(values);
       if (response.data?.token) {
         localStorage.setItem('auth_token', response.data.token);
         toast.success('Login berhasil! Mengalihkan ke dashboard...');
         router.push('/dashboard');
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Kombinasi email atau kata sandi tidak cocok.');
-    } finally {
-      setIsLoading(false);
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : 'Kombinasi email atau kata sandi tidak cocok.'
+      );
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4" data-testid="auth-login-form">
-      <div>
-        <label className="block text-sm font-medium text-foreground mb-1">
-          Alamat Email
-        </label>
-        <input
-          type="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          data-testid="auth-login-email-input"
-          placeholder="nama@email.com"
-          className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
-        />
-      </div>
+    <Formik<LoginFormValues>
+      initialValues={{ email: '', password: '' }}
+      validate={validateWithZod(loginSchema)}
+      onSubmit={handleLoginSubmit}
+    >
+      {({ isSubmitting }) => (
+        <Form className="space-y-4" data-testid="auth-login-form">
+          <FormController
+            name="email"
+            label="Alamat Email"
+            type="email"
+            required
+            placeholder="nama@email.com"
+            data-testid="auth-login-email"
+          />
 
-      <div>
-        <label className="block text-sm font-medium text-foreground mb-1">
-          Kata Sandi
-        </label>
-        <input
-          type="password"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          data-testid="auth-login-password-input"
-          placeholder="••••••••"
-          className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
-        />
-      </div>
+          <FormController
+            name="password"
+            label="Kata Sandi"
+            type="password"
+            required
+            placeholder="••••••••"
+            data-testid="auth-login-password"
+          />
 
-      <Button
-        type="submit"
-        disabled={isLoading}
-        className="w-full"
-        data-testid="auth-login-submit-btn"
-      >
-        {isLoading ? 'Memproses Masuk...' : 'Masuk ke Akun'}
-      </Button>
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full"
+            data-testid="auth-login-submit-btn"
+          >
+            {isSubmitting ? 'Memproses Masuk...' : 'Masuk ke Akun'}
+          </Button>
 
-      <div className="text-center text-xs text-muted-foreground pt-2">
-        Belum memiliki akun?{' '}
-        <Link href="/register" className="font-medium text-primary hover:underline">
-          Daftar Sekarang
-        </Link>
-      </div>
-    </form>
+          <div className="text-center text-xs text-muted-foreground pt-2">
+            Belum memiliki akun?{' '}
+            <Link
+              href="/register"
+              className="font-medium text-primary hover:underline"
+            >
+              Daftar Sekarang
+            </Link>
+          </div>
+        </Form>
+      )}
+    </Formik>
   );
 }

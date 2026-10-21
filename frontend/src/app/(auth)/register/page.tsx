@@ -3,98 +3,106 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { Formik, Form } from 'formik';
+import { z } from 'zod';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
+import { FormController } from '@/components/ui/form-controller';
+import { validateWithZod } from '@/lib/zod-formik';
 import { authApi } from '@/services/api/auth.api';
+
+const registerSchema = z.object({
+  fullName: z
+    .string()
+    .min(1, 'Nama lengkap wajib diisi.')
+    .min(3, 'Nama lengkap minimal 3 karakter.'),
+  email: z
+    .string()
+    .min(1, 'Alamat email wajib diisi.')
+    .email('Format alamat email tidak valid.'),
+  password: z
+    .string()
+    .min(1, 'Kata sandi wajib diisi.')
+    .min(8, 'Kata sandi minimal 8 karakter.'),
+});
+
+type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [fullName, setFullName] = React.useState('');
-  const [email, setEmail] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  const [isLoading, setIsLoading] = React.useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
+  const handleRegisterSubmit = async (values: RegisterFormValues) => {
     try {
-      const response = await authApi.register({ fullName, email, password });
+      const response = await authApi.register(values);
       if (response.data?.token) {
         localStorage.setItem('auth_token', response.data.token);
         toast.success('Pendaftaran berhasil! Mengalihkan ke dashboard...');
         router.push('/dashboard');
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Pendaftaran gagal. Silakan coba lagi.');
-    } finally {
-      setIsLoading(false);
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : 'Pendaftaran gagal. Silakan coba lagi.'
+      );
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4" data-testid="auth-register-form">
-      <div>
-        <label className="block text-sm font-medium text-foreground mb-1">
-          Nama Lengkap
-        </label>
-        <input
-          type="text"
-          required
-          value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
-          data-testid="auth-register-name-input"
-          placeholder="Nama Anda"
-          className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
-        />
-      </div>
+    <Formik<RegisterFormValues>
+      initialValues={{ fullName: '', email: '', password: '' }}
+      validate={validateWithZod(registerSchema)}
+      onSubmit={handleRegisterSubmit}
+    >
+      {({ isSubmitting }) => (
+        <Form className="space-y-4" data-testid="auth-register-form">
+          {/* type tidak didefinisikan -> otomatis fallback ke 'text' */}
+          <FormController
+            name="fullName"
+            label="Nama Lengkap"
+            required
+            placeholder="Nama Anda"
+            data-testid="auth-register-name"
+          />
 
-      <div>
-        <label className="block text-sm font-medium text-foreground mb-1">
-          Alamat Email
-        </label>
-        <input
-          type="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          data-testid="auth-register-email-input"
-          placeholder="nama@email.com"
-          className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
-        />
-      </div>
+          <FormController
+            name="email"
+            label="Alamat Email"
+            type="email"
+            required
+            placeholder="nama@email.com"
+            data-testid="auth-register-email"
+          />
 
-      <div>
-        <label className="block text-sm font-medium text-foreground mb-1">
-          Kata Sandi (Min. 8 Karakter)
-        </label>
-        <input
-          type="password"
-          required
-          minLength={8}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          data-testid="auth-register-password-input"
-          placeholder="••••••••"
-          className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
-        />
-      </div>
+          <FormController
+            name="password"
+            label="Kata Sandi (Min. 8 Karakter)"
+            type="password"
+            required
+            placeholder="••••••••"
+            data-testid="auth-register-password"
+          />
 
-      <Button
-        type="submit"
-        disabled={isLoading}
-        className="w-full"
-        data-testid="auth-register-submit-btn"
-      >
-        {isLoading ? 'Mendaftarkan Akun...' : 'Daftar Akun Baru'}
-      </Button>
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full"
+            data-testid="auth-register-submit-btn"
+          >
+            {isSubmitting ? 'Mendaftarkan Akun...' : 'Daftar Akun Baru'}
+          </Button>
 
-      <div className="text-center text-xs text-muted-foreground pt-2">
-        Sudah memiliki akun?{' '}
-        <Link href="/login" className="font-medium text-primary hover:underline">
-          Masuk di sini
-        </Link>
-      </div>
-    </form>
+          <div className="text-center text-xs text-muted-foreground pt-2">
+            Sudah memiliki akun?{' '}
+            <Link
+              href="/login"
+              className="font-medium text-primary hover:underline"
+            >
+              Masuk di sini
+            </Link>
+          </div>
+        </Form>
+      )}
+    </Formik>
   );
 }
