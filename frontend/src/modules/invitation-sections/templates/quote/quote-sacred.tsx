@@ -10,7 +10,7 @@ export const QuoteSacred: React.FC<SectionRenderProps<'quote'>> = ({ data }) => 
   return (
     <section
       data-testid="section-quote-sacred"
-      className="relative w-full py-12 px-6 text-center"
+      className="relative w-full py-12 px-6 text-center flex flex-col items-center justify-center min-h-[100dvh] min-h-screen"
       style={{
         backgroundColor: 'var(--inv-bg, #FAF8F5)',
       }}

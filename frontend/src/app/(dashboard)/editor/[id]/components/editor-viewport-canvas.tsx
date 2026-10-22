@@ -5,10 +5,14 @@ import { useInvitationEditorStore } from '@/lib/stores/invitation-editor.store';
 import { generateCanvasStyleVars } from '@/lib/style-helpers';
 import { resolveSectionComponent } from '@/modules/invitation-sections/registry';
 import { CanvasSectionWrapper } from '@/modules/invitation-sections/canvas-section-wrapper';
+import { CoverGateOverlay } from '@/modules/invitation-sections/cover-gate-overlay';
+import { InvitationAudioPlayer } from '@/modules/invitation-sections/invitation-audio-player';
 import { EditorDeviceToolbar } from './editor-device-toolbar';
+import type { HeroSectionData } from '@/modules/invitation-sections/types';
 import { cn } from '@/lib/utils';
 
 export const EditorViewportCanvas: React.FC = () => {
+  const invitation = useInvitationEditorStore((s) => s.invitation);
   const sections = useInvitationEditorStore((s) => s.sections);
   const themeConfig = useInvitationEditorStore((s) => s.themeConfig);
   const activeSectionId = useInvitationEditorStore((s) => s.activeSectionId);
@@ -18,8 +22,21 @@ export const EditorViewportCanvas: React.FC = () => {
   const duplicateSection = useInvitationEditorStore((s) => s.duplicateSection);
   const deleteSection = useInvitationEditorStore((s) => s.deleteSection);
 
+  // Status Cover Gate (di editor default dibuka agar langsung bisa edit, tapi bisa diuji via toolbar)
+  const [isCoverOpen, setIsCoverOpen] = React.useState(true);
+  const [isPlayingAudio, setIsPlayingAudio] = React.useState(false);
+
   const canvasStyle = generateCanvasStyleVars(themeConfig);
   const visibleSections = sections.filter((s) => s.isVisible);
+
+  // Ambil data nama pengantin dari Hero section untuk preview cover
+  const heroSection = sections.find((s) => s.type === 'hero');
+  const heroData = (heroSection?.data || {}) as HeroSectionData;
+
+  const handleOpenInvitation = () => {
+    setIsCoverOpen(true);
+    setIsPlayingAudio(true);
+  };
 
   return (
     <div
@@ -27,9 +44,12 @@ export const EditorViewportCanvas: React.FC = () => {
       data-testid="editor-viewport-canvas-container"
       onClick={() => setActiveSection(null)}
     >
-      {/* Top Floating Device Viewport Controller */}
+      {/* Top Floating Device Viewport Controller & Cover Simulation Toggle */}
       <div className="absolute top-3 left-1/2 -translate-x-1/2 z-30 pointer-events-auto">
-        <EditorDeviceToolbar />
+        <EditorDeviceToolbar
+          isCoverOpen={isCoverOpen}
+          onToggleCover={() => setIsCoverOpen((prev) => !prev)}
+        />
       </div>
 
       {/* Canvas Scrollable Workspace */}
@@ -40,7 +60,7 @@ export const EditorViewportCanvas: React.FC = () => {
           className={cn(
             'transition-all duration-300 relative shadow-2xl bg-card overflow-hidden flex flex-col',
             viewportMode === 'mobile' &&
-              'w-[390px] min-h-[800px] rounded-[44px] border-[6px] border-slate-300 dark:border-slate-700 my-4',
+              'w-[390px] min-h-[820px] rounded-[44px] border-[6px] border-slate-300 dark:border-slate-700 my-4',
             viewportMode === 'tablet' &&
               'w-[640px] min-h-[850px] rounded-[32px] border-[8px] border-slate-300 dark:border-slate-700 my-4',
             viewportMode === 'full' && 'w-full max-w-4xl min-h-screen rounded-xl border border-border my-2'
@@ -50,6 +70,18 @@ export const EditorViewportCanvas: React.FC = () => {
           {viewportMode === 'mobile' && (
             <div className="absolute top-2 left-1/2 -translate-x-1/2 w-28 h-4 bg-slate-300 dark:bg-slate-700 rounded-full z-30 pointer-events-none" />
           )}
+
+          {/* Interactive Cover Gate Overlay (Simulasi Layar Cover Pembuka) */}
+          <CoverGateOverlay
+            isOpen={isCoverOpen}
+            onOpen={handleOpenInvitation}
+            title={invitation?.title || 'Undangan Pernikahan'}
+            groomName={heroData.groomName}
+            brideName={heroData.brideName}
+            guestName="Bapak Budi Santoso & Keluarga"
+            themeConfig={themeConfig}
+            isEditor
+          />
 
           {/* Dynamic Invitation Canvas with Injected CSS Variables */}
           <div
@@ -89,6 +121,13 @@ export const EditorViewportCanvas: React.FC = () => {
               })
             )}
           </div>
+
+          {/* Floating Audio Player Preview in Editor */}
+          <InvitationAudioPlayer
+            isPlaying={isPlayingAudio}
+            onTogglePlay={() => setIsPlayingAudio((prev) => !prev)}
+            audioUrl={themeConfig.audioUrl}
+          />
         </div>
       </div>
     </div>

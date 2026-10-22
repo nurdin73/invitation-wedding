@@ -239,7 +239,93 @@ export const EditorSectionInspector: React.FC = () => {
           );
         })()}
 
-        {/* Event Specific */}
+        {/* Story / Love Story Specific */}
+        {activeSection.type === 'story' && (() => {
+          const st = activeSection.data as { stories?: Array<{ id: string; year: string; title: string; story: string }> };
+          const stories = st.stories || [];
+          return (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="font-semibold text-foreground">Daftar Momen Cerita</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const next = [
+                      ...stories,
+                      {
+                        id: `st-${Date.now()}`,
+                        year: '2026',
+                        title: 'Momen Baru',
+                        story: 'Ceritakan kisah indah perjalanan cinta Anda...',
+                      },
+                    ];
+                    handleTextChange('stories', next);
+                  }}
+                  className="text-[11px] font-semibold text-primary hover:underline"
+                >
+                  + Tambah Momen
+                </button>
+              </div>
+
+              {stories.map((item, idx) => (
+                <div key={item.id || idx} className="p-3 rounded-lg border border-border space-y-2 bg-card-oat/20">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-semibold uppercase text-primary">Momen #{idx + 1}</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const next = stories.filter((_, i) => i !== idx);
+                        handleTextChange('stories', next);
+                      }}
+                      className="text-[10px] text-muted-foreground hover:text-destructive"
+                    >
+                      Hapus
+                    </button>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] text-muted-foreground">Tahun</label>
+                    <input
+                      type="text"
+                      value={item.year}
+                      onChange={(e) => {
+                        const next = [...stories];
+                        next[idx] = { ...next[idx], year: e.target.value };
+                        handleTextChange('stories', next);
+                      }}
+                      className="w-full rounded border px-2 py-1 text-xs bg-background font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] text-muted-foreground">Judul Momen</label>
+                    <input
+                      type="text"
+                      value={item.title}
+                      onChange={(e) => {
+                        const next = [...stories];
+                        next[idx] = { ...next[idx], title: e.target.value };
+                        handleTextChange('stories', next);
+                      }}
+                      className="w-full rounded border px-2 py-1 text-xs bg-background"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] text-muted-foreground">Kisah Singkat</label>
+                    <textarea
+                      rows={2}
+                      value={item.story}
+                      onChange={(e) => {
+                        const next = [...stories];
+                        next[idx] = { ...next[idx], story: e.target.value };
+                        handleTextChange('stories', next);
+                      }}
+                      className="w-full rounded border px-2 py-1 text-xs bg-background resize-none"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          );
+        })()}
         {activeSection.type === 'event' && (() => {
           const ev = activeSection.data as EventSectionData;
           return (

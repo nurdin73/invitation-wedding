@@ -17,6 +17,7 @@ import {
   MessageSquare,
   Gift,
   CheckCircle,
+  Sparkles,
 } from 'lucide-react';
 import { useInvitationEditorStore } from '@/lib/stores/invitation-editor.store';
 import type { SectionType } from '@/modules/invitation-sections/types';
@@ -52,6 +53,12 @@ const SECTION_CATALOG: SectionCatalogItem[] = [
     title: 'Agenda Acara & Peta',
     description: 'Waktu, tanggal, lokasi gedung Akad dan Resepsi serta integrasi Google Maps.',
     icon: Calendar,
+  },
+  {
+    type: 'story',
+    title: 'Kisah Cinta (Love Story)',
+    description: 'Linimasa perjalanan cinta kedua mempelai dari awal bertemu hingga menuju pelaminan.',
+    icon: Sparkles,
   },
   {
     type: 'gallery',

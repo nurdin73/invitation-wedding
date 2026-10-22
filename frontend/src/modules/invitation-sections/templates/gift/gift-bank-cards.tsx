@@ -36,7 +36,7 @@ export const GiftBankCards: React.FC<SectionRenderProps<'gift'>> = ({ data }) =>
   return (
     <section
       data-testid="section-gift-bank-cards"
-      className="relative w-full py-12 px-6 text-center space-y-6"
+      className="relative w-full py-16 px-6 text-center space-y-6 flex flex-col justify-center items-center min-h-[100dvh] min-h-screen"
       style={{
         backgroundColor: 'var(--inv-bg, #FAF8F5)',
         color: 'var(--inv-font-body, #3A302C)',

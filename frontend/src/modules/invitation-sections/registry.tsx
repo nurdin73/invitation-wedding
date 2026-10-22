@@ -8,6 +8,7 @@ import { GalleryGrid } from './templates/gallery/gallery-grid';
 import { RsvpInteractive } from './templates/rsvp/rsvp-interactive';
 import { GiftBankCards } from './templates/gift/gift-bank-cards';
 import { FooterClosing } from './templates/footer/footer-closing';
+import { StoryTimeline } from './templates/story/story-timeline';
 
 // Type-safe registry mapping
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -32,7 +33,8 @@ export const SECTION_REGISTRY: Record<SectionType, Record<string, AnySectionComp
     default: EventCards,
   },
   story: {
-    default: QuoteSacred,
+    timeline: StoryTimeline,
+    default: StoryTimeline,
   },
   gallery: {
     grid: GalleryGrid,

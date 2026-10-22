@@ -1,13 +1,13 @@
 'use client';
 
-import * as React from 'react';
-import { Palette, Type } from 'lucide-react';
+import { Palette, Type, Music } from 'lucide-react';
 import { useInvitationEditorStore } from '@/lib/stores/invitation-editor.store';
 import {
   THEME_PALETTES,
   FONT_OPTIONS_HEADING,
   FONT_OPTIONS_BODY,
 } from '@/lib/style-helpers';
+import { AUDIO_PRESETS } from '@/modules/invitation-sections/audio-presets';
 
 export const EditorThemeSettings: React.FC = () => {
   const themeConfig = useInvitationEditorStore((s) => s.themeConfig);
@@ -163,6 +163,54 @@ export const EditorThemeSettings: React.FC = () => {
               </option>
             ))}
           </select>
+        </div>
+      </div>
+
+      {/* Background Audio Settings */}
+      <div className="space-y-3 pt-2 border-t border-border">
+        <label className="font-semibold text-foreground flex items-center gap-1.5">
+          <Music className="w-3.5 h-3.5 text-primary" />
+          <span>Musik Latar (Background Audio)</span>
+        </label>
+        <p className="text-[11px] text-muted-foreground">
+          Musik otomatis diputar saat tamu mengklik tombol &quot;Buka Undangan&quot;.
+        </p>
+
+        <div className="space-y-2">
+          {AUDIO_PRESETS.map((track) => {
+            const isSelected = (themeConfig.audioUrl || AUDIO_PRESETS[0].url) === track.url;
+            return (
+              <button
+                key={track.id}
+                type="button"
+                onClick={() => updateThemeConfig({ audioUrl: track.url })}
+                className={`w-full p-2.5 rounded-lg border text-left transition-all flex items-center justify-between ${
+                  isSelected
+                    ? 'border-primary ring-1 ring-primary bg-primary/5 text-primary'
+                    : 'border-border bg-card hover:border-primary/40 text-foreground'
+                }`}
+              >
+                <div>
+                  <p className="font-medium text-[11px]">{track.title}</p>
+                  <p className="text-[10px] text-muted-foreground">{track.artist}</p>
+                </div>
+                {isSelected && <span className="text-[10px] font-bold">✓ Aktif</span>}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="pt-1">
+          <label className="block text-[11px] text-muted-foreground mb-1">
+            Atau Tautan MP3 Kustom
+          </label>
+          <input
+            type="url"
+            value={themeConfig.audioUrl || ''}
+            onChange={(e) => updateThemeConfig({ audioUrl: e.target.value })}
+            placeholder="https://domain.com/musik-pernikahan.mp3"
+            className="w-full rounded-md border border-input bg-background px-2.5 py-1.5 text-xs text-foreground font-mono focus:outline-none focus:ring-1 focus:ring-ring"
+          />
         </div>
       </div>
     </div>

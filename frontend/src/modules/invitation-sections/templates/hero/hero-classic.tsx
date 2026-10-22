@@ -3,6 +3,7 @@
 import * as React from 'react';
 import type { SectionRenderProps, HeroSectionData } from '../../types';
 import { Heart, Calendar } from 'lucide-react';
+import { CountdownTimer } from '../../components/countdown-timer';
 
 export const HeroClassic: React.FC<SectionRenderProps<'hero'>> = ({ data }) => {
   const hero = data as HeroSectionData;
@@ -10,7 +11,7 @@ export const HeroClassic: React.FC<SectionRenderProps<'hero'>> = ({ data }) => {
   return (
     <section
       data-testid="section-hero-classic"
-      className="relative w-full py-16 px-6 text-center flex flex-col items-center justify-center min-h-[460px] overflow-hidden"
+      className="relative w-full py-12 px-6 text-center flex flex-col items-center justify-center min-h-[100dvh] min-h-screen overflow-hidden"
       style={{
         backgroundColor: 'var(--inv-bg, #FAF8F5)',
         color: 'var(--inv-font-body, #3A302C)',
@@ -49,6 +50,9 @@ export const HeroClassic: React.FC<SectionRenderProps<'hero'>> = ({ data }) => {
             {hero.welcomeNote}
           </p>
         )}
+
+        {/* Countdown Timer Menuju Hari H */}
+        <CountdownTimer targetDate={hero.weddingDate} />
       </div>
     </section>
   );

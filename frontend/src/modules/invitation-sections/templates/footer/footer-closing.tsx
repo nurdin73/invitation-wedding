@@ -11,7 +11,7 @@ export const FooterClosing: React.FC<SectionRenderProps<'footer'>> = ({ data }) 
   return (
     <footer
       data-testid="section-footer-closing"
-      className="relative w-full py-16 px-6 text-center space-y-4"
+      className="relative w-full py-16 px-6 text-center space-y-4 flex flex-col justify-center items-center min-h-[100dvh] min-h-screen"
       style={{
         backgroundColor: 'var(--inv-bg, #FAF8F5)',
         color: 'var(--inv-font-body, #3A302C)',

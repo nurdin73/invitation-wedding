@@ -28,7 +28,7 @@ export const CoupleSideBySide: React.FC<SectionRenderProps<'couple'>> = ({ data 
   return (
     <section
       data-testid="section-couple-side-by-side"
-      className="relative w-full py-12 px-6 text-center space-y-8"
+      className="relative w-full py-16 px-6 text-center space-y-8 flex flex-col justify-center items-center min-h-[100dvh] min-h-screen"
       style={{
         backgroundColor: 'var(--inv-bg, #FAF8F5)',
         color: 'var(--inv-font-body, #3A302C)',
