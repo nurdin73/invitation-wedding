@@ -2,7 +2,8 @@ import React from 'react';
 import { notFound } from 'next/navigation';
 import { publicApi } from '@/services/api/public.api';
 import { generateCanvasStyleVars } from '@/lib/style-helpers';
-import { siteConfig } from '@/config/site';
+import { resolveSectionComponent } from '@/modules/invitation-sections/registry';
+import type { SectionNode } from '@/modules/invitation-sections/types';
 
 interface GuestPageProps {
   params: Promise<{ slug: string }>;
@@ -24,42 +25,36 @@ export default async function GuestPage({ params }: GuestPageProps) {
   }
 
   const canvasStyle = generateCanvasStyleVars(invitation.themeConfig);
+  const sections = (Array.isArray(invitation.sections) ? invitation.sections : []) as unknown as SectionNode[];
+  const visibleSections = sections.filter((s) => s.isVisible);
 
   return (
-    <div className="min-h-screen bg-slate-900 flex justify-center selection:bg-amber-500 selection:text-white">
-      <div className="w-full max-w-md min-h-screen bg-white shadow-2xl relative flex flex-col">
-        <div
+    <div className="min-h-screen bg-slate-950 flex justify-center selection:bg-rose-500 selection:text-white">
+      <div className="w-full max-w-md min-h-screen bg-background shadow-2xl relative flex flex-col">
+        <main
           style={canvasStyle}
-          className="min-h-screen flex flex-col justify-between p-6 text-center"
+          className="min-h-screen flex flex-col font-sans"
           data-testid="guest-invitation-view"
         >
-          <div className="my-auto space-y-6">
-            <span className="text-xs uppercase tracking-widest text-slate-500 font-medium">
-              The Wedding Celebration of
-            </span>
-
-            <h1
-              className="text-4xl font-bold tracking-tight"
-              style={{
-                fontFamily: 'var(--inv-font-heading)',
-                color: 'var(--inv-primary)',
-              }}
-            >
-              {invitation.title}
-            </h1>
-
-            <div className="h-0.5 w-16 mx-auto bg-amber-500/40 rounded-full my-4" />
-
-            <p className="text-sm text-slate-600 leading-relaxed max-w-xs mx-auto">
-              Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i
-              berkenan hadir untuk memberikan doa restu.
-            </p>
-          </div>
-
-          <div className="py-6 border-t border-slate-100 text-xs text-slate-400">
-            Dibuat dengan cinta via {siteConfig.name}
-          </div>
-        </div>
+          {visibleSections.length === 0 ? (
+            <div className="my-auto p-12 text-center text-xs opacity-60">
+              Undangan pernikahan belum memiliki bagian konten yang dipublikasikan.
+            </div>
+          ) : (
+            visibleSections.map((sec) => {
+              const Component = resolveSectionComponent(sec.type, sec.variant);
+              return (
+                <Component
+                  key={sec.id}
+                  id={sec.id}
+                  data={sec.data}
+                  themeConfig={invitation.themeConfig}
+                  isEditor={false}
+                />
+              );
+            })
+          )}
+        </main>
       </div>
     </div>
   );

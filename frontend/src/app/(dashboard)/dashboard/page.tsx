@@ -3,17 +3,16 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import { Plus, X, Sparkles, HelpCircle } from 'lucide-react';
+import { Plus, Sparkles, HelpCircle, Trash2, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { invitationsApi, type InvitationData } from '@/services/api/invitations.api';
 import { useDashboardHeaderStore } from '@/lib/stores/dashboard-header.store';
+import { CreateInvitationDialog } from './components/create-invitation-dialog';
 
 export default function DashboardPage() {
   const [invitations, setInvitations] = React.useState<InvitationData[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
-  const [isCreating, setIsCreating] = React.useState(false);
-  const [newTitle, setNewTitle] = React.useState('');
-  const [newSlug, setNewSlug] = React.useState('');
+  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
 
   const setHeader = useDashboardHeaderStore((s) => s.setHeader);
   const resetHeader = useDashboardHeaderStore((s) => s.resetHeader);
@@ -35,7 +34,7 @@ export default function DashboardPage() {
     fetchInvitations();
   }, [fetchInvitations]);
 
-  // Daftarkan konfigurasi breadcrumb, title, dan action buttons ke header store
+  // Daftarkan konfigurasi breadcrumb, title, dan action button ke header store
   React.useEffect(() => {
     setHeader({
       title: 'Daftar Undangan Pernikahan',
@@ -48,11 +47,11 @@ export default function DashboardPage() {
         {
           type: 'button',
           button: {
-            id: 'toggle-create-form',
-            label: isCreating ? 'Tutup Formulir' : 'Buat Undangan Baru',
-            icon: isCreating ? X : Plus,
-            variant: isCreating ? 'outline' : 'default',
-            onClick: () => setIsCreating((prev) => !prev),
+            id: 'dashboard-create-btn',
+            label: 'Buat Undangan Baru',
+            icon: Plus,
+            variant: 'default',
+            onClick: () => setIsDialogOpen(true),
             dataTestId: 'dashboard-create-invitation-btn',
           },
         },
@@ -65,10 +64,10 @@ export default function DashboardPage() {
             items: [
               {
                 id: 'tip-guide',
-                label: 'Panduan Desain Undangan',
+                label: 'Tips Desain Visual',
                 icon: Sparkles,
                 onClick: () => {
-                  toast.info('Tips: Gunakan foto berkualitas tinggi agar tampilan undangan optimal.');
+                  toast.info('Tips: Gunakan foto resolusi tinggi dan warna palet yang kontras untuk kenyamanan mata tamu.');
                 },
               },
             ],
@@ -80,95 +79,55 @@ export default function DashboardPage() {
     return () => {
       resetHeader();
     };
-  }, [isCreating, setHeader, resetHeader]);
+  }, [setHeader, resetHeader]);
 
-  const handleCreate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newTitle || !newSlug) return;
+  const handleDelete = async (id: string, title: string) => {
+    if (!window.confirm(`Apakah Anda yakin ingin menghapus undangan "${title}"?`)) return;
 
     try {
-      const response = await invitationsApi.create({ title: newTitle, slug: newSlug });
-      if (response.data) {
-        toast.success('Undangan berhasil dibuat!');
-        setNewTitle('');
-        setNewSlug('');
-        setIsCreating(false);
-        fetchInvitations();
-      }
+      await invitationsApi.delete(id);
+      toast.success('Undangan berhasil dihapus.');
+      fetchInvitations();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Gagal membuat undangan.');
+      toast.error(err instanceof Error ? err.message : 'Gagal menghapus undangan.');
     }
   };
 
   return (
     <div className="space-y-6" data-testid="dashboard-page">
-      {/* Formulir Buat Undangan Baru */}
-      {isCreating && (
-        <form
-          onSubmit={handleCreate}
-          className="rounded-xl border bg-card p-5 space-y-4 shadow-sm max-w-lg transition-all"
-          data-testid="dashboard-create-form"
-        >
-          <div className="border-b border-border pb-2">
-            <h2 className="text-base font-semibold text-foreground">Buat Undangan Baru</h2>
-            <p className="text-xs text-muted-foreground">
-              Masukkan judul dan tautan unik untuk mulai mendesain undangan Anda.
-            </p>
-          </div>
-          <div>
-            <label className="block text-xs font-medium mb-1 text-foreground">
-              Judul Undangan
-            </label>
-            <input
-              type="text"
-              required
-              value={newTitle}
-              onChange={(e) => setNewTitle(e.target.value)}
-              placeholder="Pernikahan Romeo & Juliet"
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-medium mb-1 text-foreground">
-              Tautan Unik (Slug)
-            </label>
-            <input
-              type="text"
-              required
-              value={newSlug}
-              onChange={(e) => setNewSlug(e.target.value)}
-              placeholder="romeo-juliet"
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring font-mono"
-            />
-          </div>
-          <div className="flex items-center gap-2 pt-2">
-            <Button type="submit" size="sm">
-              Simpan & Buka Editor
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsCreating(false)}
-            >
-              Batal
-            </Button>
-          </div>
-        </form>
-      )}
+      {/* Modal Dialog Buat Undangan Baru */}
+      <CreateInvitationDialog
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        onSuccess={fetchInvitations}
+      />
 
       {/* Grid Konten Undangan */}
       {isLoading ? (
-        <div className="p-12 text-center text-sm text-muted-foreground">
-          Memuat data undangan...
+        <div className="p-12 text-center text-xs text-muted-foreground">
+          Memuat data undangan Anda...
         </div>
       ) : invitations.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-border p-12 text-center bg-card-oat/50">
-          <p className="text-sm font-medium text-muted-foreground mb-3">
-            Anda belum memiliki undangan pernikahan.
-          </p>
-          <Button size="sm" onClick={() => setIsCreating(true)}>
-            Mulai Buat Undangan Pertama
+        <div className="rounded-xl border border-dashed border-border p-12 text-center bg-card-oat/40 max-w-xl mx-auto space-y-4">
+          <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto">
+            <Sparkles className="w-6 h-6" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-sm text-foreground">
+              Belum Ada Undangan
+            </h3>
+            <p className="text-xs text-muted-foreground mt-1 max-w-sm mx-auto">
+              Mulai buat undangan pernikahan digital pertama Anda dengan editor interaktif kami.
+            </p>
+          </div>
+          <Button
+            size="sm"
+            onClick={() => setIsDialogOpen(true)}
+            data-testid="dashboard-empty-create-btn"
+            className="gap-1.5"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Buat Undangan Sekarang</span>
           </Button>
         </div>
       ) : (
@@ -176,25 +135,25 @@ export default function DashboardPage() {
           {invitations.map((inv) => (
             <div
               key={inv.id}
-              className="flex flex-col justify-between rounded-xl border bg-card p-5 shadow-sm hover:border-primary/40 transition-colors"
+              className="flex flex-col justify-between rounded-xl border border-border bg-card p-5 shadow-xs hover:border-primary/40 transition-all group"
               data-testid={`invitation-card-${inv.id}`}
             >
               <div>
                 <div className="flex items-center justify-between gap-2 mb-2">
                   <span
-                    className={`inline-block rounded-full px-2 py-0.5 text-[11px] font-medium ${
+                    className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${
                       inv.isPublished
-                        ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-400'
-                        : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
+                        ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 border border-emerald-200/50'
+                        : 'bg-muted text-muted-foreground border border-border'
                     }`}
                   >
                     {inv.isPublished ? 'Dipublikasikan' : 'Draft'}
                   </span>
-                  <span className="text-xs text-muted-foreground font-mono">
+                  <span className="text-[11px] text-muted-foreground font-mono">
                     /{inv.slug}
                   </span>
                 </div>
-                <h3 className="font-semibold text-base text-foreground mb-1 line-clamp-1">
+                <h3 className="font-semibold text-sm text-foreground mb-1 line-clamp-1 group-hover:text-primary transition-colors">
                   {inv.title}
                 </h3>
               </div>
@@ -205,13 +164,24 @@ export default function DashboardPage() {
                     Buka Editor
                   </Button>
                 </Link>
+
                 {inv.isPublished && (
                   <Link href={`/${inv.slug}`} target="_blank">
-                    <Button variant="outline" size="sm" className="text-xs">
-                      Lihat Tamu
+                    <Button variant="outline" size="sm" className="px-2.5" title="Lihat Tampilan Publik">
+                      <ExternalLink className="w-3.5 h-3.5" />
                     </Button>
                   </Link>
                 )}
+
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleDelete(inv.id, inv.title)}
+                  className="px-2 text-muted-foreground hover:text-destructive transition-colors"
+                  title="Hapus Undangan"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </Button>
               </div>
             </div>
           ))}
