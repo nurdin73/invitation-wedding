@@ -12,10 +12,11 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
     async ({ body, jwt }) => {
       const result = await controller.register(body);
       if (result.data) {
-        // Sign real JWT token
+        // Sign real JWT token including user role
         const token = await jwt.sign({
           id: result.data.user.id,
           email: result.data.user.email,
+          role: result.data.user.role,
         });
         result.data.token = token;
       }
@@ -26,10 +27,11 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
         email: t.String({ format: 'email' }),
         password: t.String({ minLength: 8 }),
         fullName: t.String({ minLength: 2 }),
+        role: t.Optional(t.Union([t.Literal('USER'), t.Literal('CONTRIBUTOR')])),
       }),
       detail: {
         tags: ['Authentication'],
-        summary: 'Pendaftaran pengguna baru',
+        summary: 'Pendaftaran pengguna baru (User / Contributor)',
       },
     }
   )
@@ -41,6 +43,7 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
         const token = await jwt.sign({
           id: result.data.user.id,
           email: result.data.user.email,
+          role: result.data.user.role,
         });
         result.data.token = token;
       }
@@ -57,6 +60,19 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
       },
     }
   )
+  .post(
+    '/logout',
+    async ({ user }) => {
+      return await controller.logout(user.id);
+    },
+    {
+      isAuth: true,
+      detail: {
+        tags: ['Authentication'],
+        summary: 'Mengakhiri sesi autentikasi',
+      },
+    }
+  )
   .get(
     '/me',
     async ({ user }) => {
@@ -67,6 +83,65 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
       detail: {
         tags: ['Authentication'],
         summary: 'Mengambil data profil pengguna saat ini',
+      },
+    }
+  )
+  .post(
+    '/forgot-password',
+    async ({ body }) => {
+      return await controller.forgotPassword(body);
+    },
+    {
+      body: t.Object({
+        email: t.String({ format: 'email' }),
+      }),
+      detail: {
+        tags: ['Authentication'],
+        summary: 'Permintaan tautan atur ulang kata sandi',
+      },
+    }
+  )
+  .post(
+    '/reset-password',
+    async ({ body }) => {
+      return await controller.resetPassword(body);
+    },
+    {
+      body: t.Object({
+        token: t.String({ minLength: 10 }),
+        newPassword: t.String({ minLength: 8 }),
+      }),
+      detail: {
+        tags: ['Authentication'],
+        summary: 'Menyimpan kata sandi baru menggunakan token reset',
+      },
+    }
+  )
+  .post(
+    '/verify-email/send',
+    async ({ user }) => {
+      return await controller.sendEmailVerification(user.id);
+    },
+    {
+      isAuth: true,
+      detail: {
+        tags: ['Authentication'],
+        summary: 'Kirim ulang email verifikasi akun',
+      },
+    }
+  )
+  .post(
+    '/verify-email/confirm',
+    async ({ body }) => {
+      return await controller.verifyEmail(body);
+    },
+    {
+      body: t.Object({
+        token: t.String({ minLength: 10 }),
+      }),
+      detail: {
+        tags: ['Authentication'],
+        summary: 'Konfirmasi verifikasi email menggunakan token',
       },
     }
   );

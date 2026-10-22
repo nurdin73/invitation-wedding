@@ -410,35 +410,62 @@ export const publicApi = {
 import { apiClient } from '@/lib/axios';
 import type { ApiResponse } from '@/types/api';
 
-export interface UserModel {
+export type UserRole = 'USER' | 'CONTRIBUTOR' | 'ADMIN';
+
+export interface UserProfile {
   id: string;
   email: string;
-  name: string;
-  role: string;
+  fullName: string;
+  role: UserRole;
+  isEmailVerified: boolean;
+  emailVerifiedAt: string | null;
+  createdAt: string;
 }
 
 export const authApi = {
-  async login(payload: { email: string; password: string }): Promise<ApiResponse<{ user: UserModel; token?: string }>> {
-    const res = await apiClient.post<ApiResponse<{ user: UserModel; token?: string }>>('/auth/login', payload);
+  async login(payload: { email: string; password: string }): Promise<ApiResponse<{ user: UserProfile; token: string }>> {
+    const res = await apiClient.post<ApiResponse<{ user: UserProfile; token: string }>>('/auth/login', payload);
     return res.data;
   },
 
-  async register(payload: { name: string; email: string; password: string }): Promise<ApiResponse<{ user: UserModel }>> {
-    const res = await apiClient.post<ApiResponse<{ user: UserModel }>>('/auth/register', payload);
+  async register(payload: { fullName: string; email: string; password: string; role?: 'USER' | 'CONTRIBUTOR' }): Promise<ApiResponse<{ user: UserProfile; token: string }>> {
+    const res = await apiClient.post<ApiResponse<{ user: UserProfile; token: string }>>('/auth/register', payload);
     return res.data;
   },
 
-  async getSession(): Promise<ApiResponse<UserModel>> {
-    const res = await apiClient.get<ApiResponse<UserModel>>('/auth/me');
+  async getProfile(): Promise<ApiResponse<UserProfile>> {
+    const res = await apiClient.get<ApiResponse<UserProfile>>('/auth/me');
     return res.data;
   },
 
   async logout(): Promise<ApiResponse<null>> {
     const res = await apiClient.post<ApiResponse<null>>('/auth/logout');
     return res.data;
+  },
+
+  async forgotPassword(payload: { email: string }): Promise<ApiResponse<null>> {
+    const res = await apiClient.post<ApiResponse<null>>('/auth/forgot-password', payload);
+    return res.data;
+  },
+
+  async resetPassword(payload: { token: string; newPassword: string }): Promise<ApiResponse<null>> {
+    const res = await apiClient.post<ApiResponse<null>>('/auth/reset-password', payload);
+    return res.data;
+  },
+
+  async sendEmailVerification(): Promise<ApiResponse<null>> {
+    const res = await apiClient.post<ApiResponse<null>>('/auth/verify-email/send');
+    return res.data;
+  },
+
+  async confirmEmailVerification(payload: { token: string }): Promise<ApiResponse<null>> {
+    const res = await apiClient.post<ApiResponse<null>>('/auth/verify-email/confirm', payload);
+    return res.data;
   }
 };
 ```
+> **Catatan Keamanan Sesi**: Token otentikasi disimpan **eksklusif di HTTP Cookie** (`auth_token`), dibaca oleh Next.js Edge Middleware (`middleware.ts`), dan dipasok ke Axios via `getAuthCookie()`. `localStorage` hanya digunakan untuk cache presentasi profil non-sensitif (`auth_user`) dan dibersihkan otomatis saat logout via `clearAuthSession()`.
+
 
 ---
 

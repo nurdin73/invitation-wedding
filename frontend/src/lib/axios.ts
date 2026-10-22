@@ -20,16 +20,19 @@ export const apiClient = axios.create({
   },
 });
 
-// Interceptor untuk menambahkan Bearer token jika tersedia di client
+import { getAuthCookie } from './auth-session';
+
+// Interceptor untuk menambahkan Bearer token dari Cookie jika tersedia di client
 apiClient.interceptors.request.use((config) => {
   if (typeof window !== 'undefined') {
-    const token = localStorage.getItem('auth_token');
+    const token = getAuthCookie();
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
   }
   return config;
 });
+
 
 // Interceptor response untuk normalisasi ApiResponse
 apiClient.interceptors.response.use(

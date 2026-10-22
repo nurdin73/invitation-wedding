@@ -1,4 +1,5 @@
 import { DrizzleUserRepository } from '../outbound/repository/drizzle-user.repository';
+import { DrizzleAuthTokenRepository } from '../outbound/repository/drizzle-auth-token.repository';
 import { DrizzleInvitationRepository } from '../outbound/repository/drizzle-invitation.repository';
 import { DrizzleOrderRepository } from '../outbound/repository/drizzle-order.repository';
 import { S3StorageAdapter } from '../outbound/storage/s3-storage.adapter';
@@ -6,6 +7,7 @@ import { MidtransPaymentAdapter } from '../outbound/payment/midtrans-payment.ada
 import { NodemailerSmtpAdapter } from '../outbound/smtp/nodemailer-smtp.adapter';
 
 import type { IUserRepository } from '../outbound/user-repository.port';
+import type { IAuthTokenRepository } from '../outbound/auth-token-repository.port';
 import type { IInvitationRepository } from '../outbound/invitation-repository.port';
 import type { IOrderRepository } from '../outbound/order-repository.port';
 import type { IStoragePort } from '../outbound/storage.port';
@@ -25,6 +27,7 @@ import type { IMediaService } from '../services/media.service';
 export class Registry {
   // Outbound Driven Adapters
   public readonly userRepository: IUserRepository;
+  public readonly authTokenRepository: IAuthTokenRepository;
   public readonly invitationRepository: IInvitationRepository;
   public readonly orderRepository: IOrderRepository;
   public readonly storagePort: IStoragePort;
@@ -40,6 +43,7 @@ export class Registry {
   constructor() {
     // 1. Inisialisasi Outbound Adapters
     this.userRepository = new DrizzleUserRepository();
+    this.authTokenRepository = new DrizzleAuthTokenRepository();
     this.invitationRepository = new DrizzleInvitationRepository();
     this.orderRepository = new DrizzleOrderRepository();
     this.storagePort = new S3StorageAdapter();
@@ -55,6 +59,7 @@ export class Registry {
 
     this.authService = new AuthServiceImplement(
       this.userRepository,
+      this.authTokenRepository,
       this.smtpPort
     );
 
@@ -68,3 +73,4 @@ export class Registry {
 }
 
 export const registry = new Registry();
+

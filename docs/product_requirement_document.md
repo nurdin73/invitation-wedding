@@ -96,10 +96,15 @@ Sistem tipografi aplikasi platform menggunakan Sans-Serif modern berorientasi UI
 
 ### 5.1 Modul Autentikasi & Akun
 * **Registrasi & Login:** Email/Password dan Google One-Tap Sign In.
-* **Manajemen Profil:** Pengaturan profil dasar dan ganti kata sandi.
-* **Role & Status Akun:**
+* **Manajemen Profil:** Pengaturan profil dasar, ganti kata sandi, dan status verifikasi email.
+* **Peran Pengguna (User Roles):**
+  * `USER`: Calon pengantin yang membuat, mengelola, dan mempublikasikan undangan pernikahan.
+  * `CONTRIBUTOR`: Desainer template yang mengirimkan karya template website & kartu fisik, serta mendapatkan bagi hasil (revenue share) setiap karyanya digunakan.
+  * `ADMIN`: Administrator internal platform untuk verifikasi konten dan moderasi transaksi.
+* **Tingkat Langganan (Subscription Tier):**
   * `FREE_TRIAL`: Akses editor terbatas / watermark saat preview / URL draft.
   * `ACTIVE_SUBSCRIBER`: Akses publikasi penuh pada URL slug utama, tanpa watermark.
+
 
 ### 5.2 Modul Billing & Langganan (Subscription/Pay-per-Event)
 * **Model Monetisasi:**

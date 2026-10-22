@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Formik, Form } from 'formik';
 import { z } from 'zod';
 import { toast } from 'sonner';
@@ -12,6 +12,7 @@ import { FormController } from '@/components/ui/form-controller';
 import { AuthSocialButtons } from '@/components/auth/auth-social-buttons';
 import { validateWithZod } from '@/lib/zod-formik';
 import { authApi } from '@/services/api/auth.api';
+import { saveAuthSession } from '@/lib/auth-session';
 
 const loginSchema = z.object({
   email: z
@@ -26,16 +27,19 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
-export default function LoginPage() {
+function LoginFormContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTarget = searchParams.get('redirect') || '/dashboard';
 
   const handleLoginSubmit = async (values: LoginFormValues) => {
     try {
       const response = await authApi.login(values);
-      if (response.data?.token) {
-        localStorage.setItem('auth_token', response.data.token);
+      if (response.data?.token && response.data?.user) {
+        // Simpan token eksklusif di Cookie & profil non-sensitif di localStorage
+        saveAuthSession(response.data.token, response.data.user);
         toast.success('Login berhasil! Mengalihkan ke dashboard...');
-        router.push('/dashboard');
+        router.push(redirectTarget);
       }
     } catch (err) {
       toast.error(
@@ -57,7 +61,7 @@ export default function LoginPage() {
           Selamat Datang Kembali
         </h1>
         <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-          Akses akun Anda untuk mengelola undangan, memantau RSVP tamu, dan membagikan momen bahagia.
+          Akses akun Anda untuk mengelola undangan, memantau RSVP tamu, atau mempublikasikan karya desain Anda.
         </p>
       </div>
 
@@ -134,5 +138,13 @@ export default function LoginPage() {
         )}
       </Formik>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <React.Suspense fallback={<div className="w-full max-w-md mx-auto py-12 text-center text-sm text-muted-foreground">Memuat formulir masuk...</div>}>
+      <LoginFormContent />
+    </React.Suspense>
   );
 }

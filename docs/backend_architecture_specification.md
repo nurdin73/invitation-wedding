@@ -39,7 +39,8 @@ backend/
 │   │   ├── index.ts                               # Database connection pool (Bun postgres)
 │   │   ├── migrate.ts                             # Automated database migration runner
 │   │   └── schema/                                # Drizzle Table Schemas ({table}.schema.ts)
-│   │       ├── users.schema.ts
+│   │       ├── users.schema.ts                    # User entity + role & verification flags
+│   │       ├── auth_tokens.schema.ts              # Token SHA-256 for email verification & reset
 │   │       ├── subscriptions.schema.ts
 │   │       ├── orders.schema.ts
 │   │       ├── invitations.schema.ts
@@ -60,7 +61,7 @@ backend/
 │   │       │   ├── media.routes.ts
 │   │       │   └── index.ts
 │   │       └── middlewares/
-│   │           ├── auth.macro.ts                  # Guard / JWT session validator
+│   │           ├── auth.macro.ts                  # Guard / JWT session & role validator
 │   │           └── error.handler.ts               # Global exception catcher
 │   │
 │   ├── services/                                  # Service Contracts / Interfaces (Inbound Ports)
@@ -76,6 +77,7 @@ backend/
 │   │
 │   ├── outbound/                                  # Outbound Interfaces / Driven Ports ({nama}.port.ts)
 │   │   ├── user-repository.port.ts                # interface IUserRepository
+│   │   ├── auth-token-repository.port.ts          # interface IAuthTokenRepository
 │   │   ├── invitation-repository.port.ts          # interface IInvitationRepository
 │   │   ├── order-repository.port.ts               # interface IOrderRepository
 │   │   ├── storage.port.ts                        # interface IStoragePort
@@ -84,8 +86,10 @@ backend/
 │   │   │
 │   │   ├── repository/                            # Implementasi Database Repository (Drizzle ORM)
 │   │   │   ├── drizzle-user.repository.ts
+│   │   │   ├── drizzle-auth-token.repository.ts
 │   │   │   ├── drizzle-invitation.repository.ts
 │   │   │   └── drizzle-order.repository.ts
+
 │   │   ├── storage/                               # Implementasi Storage Object (S3 / R2)
 │   │   │   └── s3-storage.adapter.ts
 │   │   ├── payment/                               # Implementasi Payment Gateway

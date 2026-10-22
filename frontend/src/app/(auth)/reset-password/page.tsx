@@ -2,14 +2,15 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Formik, Form } from 'formik';
 import { z } from 'zod';
 import { toast } from 'sonner';
-import { Sparkles, ArrowLeft, CheckCircle2, Loader2 } from 'lucide-react';
+import { Sparkles, ArrowLeft, CheckCircle2, Loader2, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FormController } from '@/components/ui/form-controller';
 import { validateWithZod } from '@/lib/zod-formik';
+import { authApi } from '@/services/api/auth.api';
 
 const resetPasswordSchema = z
   .object({
@@ -28,17 +29,31 @@ const resetPasswordSchema = z
 
 type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;
 
-export default function ResetPasswordPage() {
+function ResetPasswordFormContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const token = searchParams.get('token');
   const [isSuccess, setIsSuccess] = React.useState(false);
 
-  const handleResetSubmit = async (_values: ResetPasswordFormValues) => {
+  const handleResetSubmit = async (values: ResetPasswordFormValues) => {
+    if (!token) {
+      toast.error('Token reset kata sandi tidak ditemukan pada tautan.');
+      return;
+    }
+
     try {
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      await authApi.resetPassword({
+        token,
+        newPassword: values.password,
+      });
       setIsSuccess(true);
       toast.success('Kata sandi berhasil diperbarui!');
-    } catch {
-      toast.error('Gagal memperbarui kata sandi. Silakan coba kembali.');
+    } catch (err) {
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : 'Gagal memperbarui kata sandi. Tautan mungkin telah kedaluwarsa.'
+      );
     }
   };
 
@@ -59,7 +74,24 @@ export default function ResetPasswordPage() {
         </p>
       </div>
 
-      {isSuccess ? (
+      {!token ? (
+        <div className="space-y-4 rounded-2xl border border-destructive/30 bg-destructive/5 p-6 text-center">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+            <AlertTriangle className="h-6 w-6" aria-hidden="true" />
+          </div>
+          <div className="space-y-1">
+            <p className="text-sm font-semibold text-foreground">Tautan Tidak Lengkap</p>
+            <p className="text-xs text-muted-foreground">
+              Parameter token verifikasi tidak ditemukan. Silakan buka tautan lengkap yang Anda terima di email.
+            </p>
+          </div>
+          <Link href="/forgot-password">
+            <Button variant="outline" className="w-full h-10 rounded-xl text-xs font-semibold">
+              Kirim Ulang Permintaan Reset
+            </Button>
+          </Link>
+        </div>
+      ) : isSuccess ? (
         <div className="space-y-6 rounded-2xl border border-border/80 bg-card-oat/50 p-6 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-success/20 text-success-foreground">
             <CheckCircle2 className="h-6 w-6" aria-hidden="true" />
@@ -136,5 +168,13 @@ export default function ResetPasswordPage() {
         </Formik>
       )}
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <React.Suspense fallback={<div className="w-full max-w-md mx-auto py-12 text-center text-sm text-muted-foreground">Memuat formulir atur ulang...</div>}>
+      <ResetPasswordFormContent />
+    </React.Suspense>
   );
 }

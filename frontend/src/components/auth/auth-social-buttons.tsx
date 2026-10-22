@@ -27,7 +27,7 @@ export const AuthSocialButtons: React.FC<AuthSocialButtonsProps> = ({
       </div>
 
       {/* Social Buttons Row */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 gap-3">
         {/* Google */}
         <button
           type="button"
@@ -53,19 +53,6 @@ export const AuthSocialButtons: React.FC<AuthSocialButtonsProps> = ({
               fill="#EA4335"
               d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.35 0 3.27 2.57 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
             />
-          </svg>
-        </button>
-
-        {/* Facebook */}
-        <button
-          type="button"
-          onClick={() => handleSocialClick('Facebook')}
-          aria-label="Lanjutkan dengan Facebook"
-          className="flex h-11 items-center justify-center rounded-xl border border-border/70 bg-card-oat/50 text-foreground transition-all hover:bg-card-oat hover:border-border active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/20"
-          data-testid="auth-social-facebook-btn"
-        >
-          <svg className="h-5 w-5 fill-[#1877F2]" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
           </svg>
         </button>
       </div>

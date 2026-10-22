@@ -10,6 +10,8 @@ import { Button } from '@/components/ui/button';
 import { FormController } from '@/components/ui/form-controller';
 import { validateWithZod } from '@/lib/zod-formik';
 
+import { authApi } from '@/services/api/auth.api';
+
 const forgotPasswordSchema = z.object({
   email: z
     .string()
@@ -24,14 +26,18 @@ export default function ForgotPasswordPage() {
 
   const handleForgotSubmit = async (values: ForgotPasswordFormValues) => {
     try {
-      // Simulasi panggilan permintaan reset password
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      await authApi.forgotPassword({ email: values.email });
       setSubmittedEmail(values.email);
-      toast.success('Instruksi pemulihan telah dikirim ke email Anda.');
-    } catch {
-      toast.error('Gagal mengirimkan tautan pemulihan. Silakan coba lagi.');
+      toast.success('Instruksi pemulihan telah dikirim ke email Anda jika terdaftar.');
+    } catch (err) {
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : 'Gagal mengirimkan tautan pemulihan. Silakan coba lagi.'
+      );
     }
   };
+
 
   return (
     <div className="w-full max-w-md mx-auto space-y-6" data-testid="auth-forgot-password-container">
