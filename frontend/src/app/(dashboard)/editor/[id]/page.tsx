@@ -3,9 +3,11 @@
 import * as React from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { Save, Send, Eye, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { generateCanvasStyleVars } from '@/lib/style-helpers';
 import { invitationsApi, type InvitationData } from '@/services/api/invitations.api';
+import { useDashboardHeaderStore } from '@/lib/stores/dashboard-header.store';
 
 export default function EditorPage() {
   const params = useParams();
@@ -16,6 +18,9 @@ export default function EditorPage() {
   const [isLoading, setIsLoading] = React.useState(true);
   const [isSaving, setIsSaving] = React.useState(false);
   const [isPublishing, setIsPublishing] = React.useState(false);
+
+  const setHeader = useDashboardHeaderStore((s) => s.setHeader);
+  const resetHeader = useDashboardHeaderStore((s) => s.resetHeader);
 
   const fetchDetail = React.useCallback(async () => {
     try {
@@ -35,7 +40,7 @@ export default function EditorPage() {
     fetchDetail();
   }, [fetchDetail]);
 
-  const handleSaveDraft = async () => {
+  const handleSaveDraft = React.useCallback(async () => {
     if (!invitation) return;
     setIsSaving(true);
     try {
@@ -52,9 +57,9 @@ export default function EditorPage() {
     } finally {
       setIsSaving(false);
     }
-  };
+  }, [invitation]);
 
-  const handleTogglePublish = async () => {
+  const handleTogglePublish = React.useCallback(async () => {
     if (!invitation) return;
     setIsPublishing(true);
     try {
@@ -72,7 +77,75 @@ export default function EditorPage() {
     } finally {
       setIsPublishing(false);
     }
-  };
+  }, [invitation]);
+
+  // Daftarkan konfigurasi breadcrumb, title, back button, dan actions ke header store
+  React.useEffect(() => {
+    if (!invitation) return;
+
+    setHeader({
+      title: invitation.title,
+      breadcrumbs: [
+        { label: 'Dashboard', href: '/dashboard' },
+        { label: 'Undangan Saya', href: '/dashboard' },
+        { label: invitation.title },
+      ],
+      showBackButton: true,
+      backButtonHref: '/dashboard',
+      actions: [
+        {
+          type: 'button',
+          button: {
+            id: 'editor-save-draft',
+            label: isSaving ? 'Menyimpan...' : 'Simpan Draft',
+            icon: Save,
+            variant: 'outline',
+            disabled: isSaving,
+            onClick: handleSaveDraft,
+            dataTestId: 'editor-topbar-save-btn',
+          },
+        },
+        {
+          type: 'button',
+          button: {
+            id: 'editor-publish',
+            label: isPublishing
+              ? 'Memproses...'
+              : invitation.isPublished
+              ? 'Tarik Publikasi'
+              : 'Publikasikan',
+            icon: Send,
+            variant: invitation.isPublished ? 'secondary' : 'default',
+            disabled: isPublishing,
+            onClick: handleTogglePublish,
+            dataTestId: 'editor-topbar-publish-btn',
+          },
+        },
+        {
+          type: 'dropdown',
+          dropdown: {
+            id: 'editor-options',
+            triggerLabel: 'Opsi Tampilan',
+            items: [
+              {
+                id: 'preview-guest',
+                label: 'Lihat Tampilan Tamu',
+                icon: Globe,
+                disabled: !invitation.isPublished,
+                onClick: () => {
+                  window.open(`/${invitation.slug}`, '_blank');
+                },
+              },
+            ],
+          },
+        },
+      ],
+    });
+
+    return () => {
+      resetHeader();
+    };
+  }, [invitation, isSaving, isPublishing, handleSaveDraft, handleTogglePublish, setHeader, resetHeader]);
 
   if (isLoading) {
     return (
@@ -87,51 +160,12 @@ export default function EditorPage() {
   const canvasStyle = generateCanvasStyleVars(invitation.themeConfig);
 
   return (
-    <div className="flex flex-col h-[calc(100vh-5rem)]" data-testid="editor-page">
-      {/* Editor Chrome Topbar Toolbar */}
-      <div className="flex items-center justify-between border-b bg-card px-4 py-2.5 rounded-lg mb-4">
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="sm" onClick={() => router.push('/dashboard')}>
-            ← Kembali
-          </Button>
-          <div>
-            <h2 className="font-semibold text-sm text-foreground">{invitation.title}</h2>
-            <span className="text-xs text-muted-foreground font-mono">/{invitation.slug}</span>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleSaveDraft}
-            disabled={isSaving}
-            data-testid="editor-topbar-save-btn"
-          >
-            {isSaving ? 'Menyimpan...' : 'Simpan Draft'}
-          </Button>
-
-          <Button
-            variant={invitation.isPublished ? 'secondary' : 'default'}
-            size="sm"
-            onClick={handleTogglePublish}
-            disabled={isPublishing}
-            data-testid="editor-topbar-publish-btn"
-          >
-            {isPublishing
-              ? 'Memproses...'
-              : invitation.isPublished
-              ? 'Tarik Publikasi'
-              : 'Publikasikan'}
-          </Button>
-        </div>
-      </div>
-
+    <div className="flex flex-col min-h-[calc(100vh-10rem)] w-full" data-testid="editor-page">
       {/* Editor Center Viewport: Mobile Chassis Mockup */}
-      <div className="flex-1 flex items-center justify-center overflow-auto p-4 bg-muted/40 rounded-xl">
+      <div className="flex-1 flex items-center justify-center overflow-auto p-4 sm:p-6 bg-muted/40 rounded-xl">
         <div
           data-testid="editor-mobile-chassis"
-          className="relative w-[390px] h-[780px] bg-card rounded-[40px] border-4 border-slate-300 dark:border-slate-700 shadow-2xl overflow-hidden flex flex-col"
+          className="relative w-[390px] h-[780px] bg-card rounded-[40px] border-4 border-slate-300 dark:border-slate-700 shadow-2xl overflow-hidden flex flex-col my-4"
         >
           {/* Mobile Screen Notch */}
           <div className="absolute top-2 left-1/2 -translate-x-1/2 w-32 h-4 bg-slate-300 dark:bg-slate-700 rounded-full z-20 pointer-events-none" />

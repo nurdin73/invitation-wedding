@@ -2,23 +2,81 @@
 
 import * as React from 'react';
 import { toast } from 'sonner';
+import { HelpCircle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { billingApi, type SubscriptionInfo } from '@/services/api/billing.api';
+import { useDashboardHeaderStore } from '@/lib/stores/dashboard-header.store';
 
 export default function BillingPage() {
   const [subInfo, setSubInfo] = React.useState<SubscriptionInfo | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [isProcessing, setIsProcessing] = React.useState(false);
 
-  React.useEffect(() => {
-    billingApi
-      .getSubscription()
-      .then((res) => {
-        if (res.data) setSubInfo(res.data);
-      })
-      .catch((err) => console.warn(err))
-      .finally(() => setIsLoading(false));
+  const setHeader = useDashboardHeaderStore((s) => s.setHeader);
+  const resetHeader = useDashboardHeaderStore((s) => s.resetHeader);
+
+  const fetchSubscription = React.useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const res = await billingApi.getSubscription();
+      if (res.data) setSubInfo(res.data);
+    } catch (err) {
+      console.warn(err);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
+
+  React.useEffect(() => {
+    fetchSubscription();
+  }, [fetchSubscription]);
+
+  // Daftarkan konfigurasi breadcrumb, title, back button, dan actions ke header store
+  React.useEffect(() => {
+    setHeader({
+      title: 'Paket Langganan & Tagihan',
+      breadcrumbs: [
+        { label: 'Dashboard', href: '/dashboard' },
+        { label: 'Paket & Tagihan' },
+      ],
+      showBackButton: true,
+      backButtonHref: '/dashboard',
+      actions: [
+        {
+          type: 'button',
+          button: {
+            id: 'refresh-billing-status',
+            label: 'Segarkan Status',
+            variant: 'outline',
+            icon: RefreshCw,
+            onClick: fetchSubscription,
+            dataTestId: 'billing-refresh-btn',
+          },
+        },
+        {
+          type: 'dropdown',
+          dropdown: {
+            id: 'billing-options',
+            triggerLabel: 'Informasi Tagihan',
+            triggerIcon: HelpCircle,
+            items: [
+              {
+                id: 'billing-faq',
+                label: 'FAQ Pembayaran Midtrans',
+                onClick: () => {
+                  toast.info('Pembayaran otomatis terverifikasi via QRIS, Virtual Account, atau Kartu Kredit.');
+                },
+              },
+            ],
+          },
+        },
+      ],
+    });
+
+    return () => {
+      resetHeader();
+    };
+  }, [setHeader, resetHeader, fetchSubscription]);
 
   const handleCheckout = async (plan: 'PRO' | 'PLATINUM') => {
     setIsProcessing(true);
@@ -36,16 +94,7 @@ export default function BillingPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-4xl" data-testid="billing-page">
-      <div>
-        <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-          Paket Langganan & Tagihan
-        </h2>
-        <p className="text-sm text-muted-foreground">
-          Pilih paket yang sesuai untuk mengaktifkan fitur premium dan undangan tanpa batas.
-        </p>
-      </div>
-
+    <div className="space-y-6 max-w-5xl" data-testid="billing-page">
       {isLoading ? (
         <div className="p-8 text-center text-sm text-muted-foreground">Memuat info paket...</div>
       ) : (
@@ -53,9 +102,9 @@ export default function BillingPage() {
           <div className="flex items-center justify-between">
             <div>
               <span className="text-xs uppercase font-medium text-muted-foreground">Paket Saat Ini</span>
-              <h3 className="text-xl font-bold text-foreground">
+              <h2 className="text-xl font-bold text-foreground">
                 {subInfo?.plan || 'FREE'}
-              </h3>
+              </h2>
             </div>
             <span
               className={`rounded-full px-3 py-1 text-xs font-semibold ${
