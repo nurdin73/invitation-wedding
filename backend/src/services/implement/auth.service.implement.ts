@@ -5,6 +5,10 @@ import { META_CODES } from '../../constants/meta-codes';
 import type { IUserRepository } from '../../outbound/user-repository.port';
 import type { IAuthTokenRepository } from '../../outbound/auth-token-repository.port';
 import type { ISmtpPort } from '../../outbound/smtp.port';
+import {
+  renderResetPasswordEmail,
+  renderVerificationEmail,
+} from '../../resources/email';
 import type {
   AuthResult,
   ForgotPasswordDTO,
@@ -71,27 +75,18 @@ export class AuthServiceImplement implements IAuthService {
     const verificationUrl = `${env.FRONTEND_URL}/verify-email?token=${rawVerificationToken}`;
 
     // Kirim email sambutan & verifikasi via SMTP (non-blocking)
+    const verificationEmail = renderVerificationEmail({
+      fullName: user.fullName,
+      role: user.role,
+      verificationUrl,
+    });
+
     this.smtpPort
       .sendMail({
         to: user.email,
-        subject: `Verifikasi Alamat Email Anda - ${env.APP_NAME}`,
-        html: `
-          <div style="font-family: sans-serif; max-width: 580px; margin: 0 auto; padding: 24px; border: 1px solid #ECE5DE; border-radius: 16px; background-color: #FAF8F5;">
-            <h2 style="color: #3A302C; margin-bottom: 12px;">Halo ${user.fullName},</h2>
-            <p style="color: #73635C; line-height: 1.6; font-size: 14px;">
-              Terima kasih telah bergabung di <strong>${env.APP_NAME}</strong> sebagai <em>${user.role === 'CONTRIBUTOR' ? 'Kontributor Desain' : 'Calon Pengantin'}</em>.
-              Silakan konfirmasi alamat email Anda untuk mengamankan akun dan menikmati seluruh fitur.
-            </p>
-            <div style="margin: 24px 0;">
-              <a href="${verificationUrl}" style="background-color: #B86B70; color: #FFFFFF; text-decoration: none; padding: 12px 24px; border-radius: 10px; font-weight: 600; display: inline-block;">
-                Verifikasi Email Saya
-              </a>
-            </div>
-            <p style="color: #A89B95; font-size: 12px; margin-top: 24px;">
-              Tautan ini berlaku selama 24 jam. Jika Anda tidak pernah mendaftar, abaikan email ini.
-            </p>
-          </div>
-        `,
+        subject: verificationEmail.subject,
+        html: verificationEmail.html,
+        text: verificationEmail.text,
       })
       .catch((err) => console.warn('Gagal mengirim email verifikasi registrasi:', err));
 
@@ -187,26 +182,17 @@ export class AuthServiceImplement implements IAuthService {
 
     const resetUrl = `${env.FRONTEND_URL}/reset-password?token=${rawToken}`;
 
+    const resetEmail = renderResetPasswordEmail({
+      fullName: user.fullName,
+      resetUrl,
+    });
+
     this.smtpPort
       .sendMail({
         to: user.email,
-        subject: `Permintaan Atur Ulang Kata Sandi - ${env.APP_NAME}`,
-        html: `
-          <div style="font-family: sans-serif; max-width: 580px; margin: 0 auto; padding: 24px; border: 1px solid #ECE5DE; border-radius: 16px; background-color: #FAF8F5;">
-            <h2 style="color: #3A302C; margin-bottom: 12px;">Halo ${user.fullName},</h2>
-            <p style="color: #73635C; line-height: 1.6; font-size: 14px;">
-              Kami menerima permintaan untuk mengatur ulang kata sandi akun Anda. Klik tombol di bawah ini untuk membuat kata sandi baru yang aman:
-            </p>
-            <div style="margin: 24px 0;">
-              <a href="${resetUrl}" style="background-color: #B86B70; color: #FFFFFF; text-decoration: none; padding: 12px 24px; border-radius: 10px; font-weight: 600; display: inline-block;">
-                Atur Ulang Kata Sandi
-              </a>
-            </div>
-            <p style="color: #A89B95; font-size: 12px; margin-top: 24px;">
-              Tautan ini hanya berlaku selama 1 jam. Jika Anda tidak pernah meminta perubahan ini, akun Anda tetap aman dan abaikan pesan ini.
-            </p>
-          </div>
-        `,
+        subject: resetEmail.subject,
+        html: resetEmail.html,
+        text: resetEmail.text,
       })
       .catch((err) => console.warn('Gagal mengirim email reset password:', err));
   }
@@ -266,25 +252,17 @@ export class AuthServiceImplement implements IAuthService {
 
     const verificationUrl = `${env.FRONTEND_URL}/verify-email?token=${rawToken}`;
 
+    const verificationEmail = renderVerificationEmail({
+      fullName: user.fullName,
+      role: user.role,
+      verificationUrl,
+    });
+
     await this.smtpPort.sendMail({
       to: user.email,
-      subject: `Verifikasi Alamat Email Anda - ${env.APP_NAME}`,
-      html: `
-        <div style="font-family: sans-serif; max-width: 580px; margin: 0 auto; padding: 24px; border: 1px solid #ECE5DE; border-radius: 16px; background-color: #FAF8F5;">
-          <h2 style="color: #3A302C; margin-bottom: 12px;">Halo ${user.fullName},</h2>
-          <p style="color: #73635C; line-height: 1.6; font-size: 14px;">
-            Berikut adalah tautan verifikasi alamat email untuk akun <strong>${env.APP_NAME}</strong> Anda:
-          </p>
-          <div style="margin: 24px 0;">
-            <a href="${verificationUrl}" style="background-color: #B86B70; color: #FFFFFF; text-decoration: none; padding: 12px 24px; border-radius: 10px; font-weight: 600; display: inline-block;">
-              Konfirmasi Email Saya
-            </a>
-          </div>
-          <p style="color: #A89B95; font-size: 12px; margin-top: 24px;">
-            Tautan ini berlaku selama 24 jam.
-          </p>
-        </div>
-      `,
+      subject: verificationEmail.subject,
+      html: verificationEmail.html,
+      text: verificationEmail.text,
     });
   }
 

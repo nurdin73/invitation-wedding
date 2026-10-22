@@ -13,21 +13,28 @@ import { AuthSocialButtons } from '@/components/auth/auth-social-buttons';
 import { validateWithZod } from '@/lib/zod-formik';
 import { authApi } from '@/services/api/auth.api';
 import { saveAuthSession } from '@/lib/auth-session';
+import { passwordComplexitySchema } from '@/lib/password-schema';
 
-const registerSchema = z.object({
-  fullName: z
-    .string()
-    .min(1, 'Nama lengkap wajib diisi.')
-    .min(3, 'Nama lengkap minimal 3 karakter.'),
-  email: z
-    .string()
-    .min(1, 'Alamat email wajib diisi.')
-    .email('Format alamat email tidak valid.'),
-  password: z
-    .string()
-    .min(1, 'Kata sandi wajib diisi.')
-    .min(8, 'Kata sandi minimal 8 karakter.'),
-});
+const registerSchema = z
+  .object({
+    fullName: z
+      .string()
+      .min(1, 'Nama lengkap wajib diisi.')
+      .min(3, 'Nama lengkap minimal 3 karakter.'),
+    email: z
+      .string()
+      .min(1, 'Alamat email wajib diisi.')
+      .email('Format alamat email tidak valid.'),
+    password: passwordComplexitySchema,
+    confirmPassword: z
+      .string()
+      .min(1, 'Konfirmasi kata sandi wajib diisi.'),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Konfirmasi kata sandi tidak cocok.',
+    path: ['confirmPassword'],
+  });
+
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
@@ -49,7 +56,9 @@ function RegisterFormContent() {
   const handleRegisterSubmit = async (values: RegisterFormValues) => {
     try {
       const response = await authApi.register({
-        ...values,
+        fullName: values.fullName,
+        email: values.email,
+        password: values.password,
         role: selectedRole,
       });
 
@@ -58,6 +67,7 @@ function RegisterFormContent() {
         toast.success('Pendaftaran berhasil! Kami telah mengirim tautan verifikasi ke email Anda.');
         router.push('/dashboard');
       }
+
     } catch (err) {
       toast.error(
         err instanceof Error
@@ -119,7 +129,7 @@ function RegisterFormContent() {
       </div>
 
       <Formik<RegisterFormValues>
-        initialValues={{ fullName: '', email: '', password: '' }}
+        initialValues={{ fullName: '', email: '', password: '', confirmPassword: '' }}
         validate={validateWithZod(registerSchema)}
         onSubmit={handleRegisterSubmit}
       >
@@ -147,9 +157,20 @@ function RegisterFormContent() {
               label="Kata Sandi"
               type="password"
               required
-              placeholder="Minimal 8 karakter"
+              placeholder="Min. 8 karakter (huruf besar, angka & simbol)"
               data-testid="auth-register-password"
             />
+
+
+            <FormController
+              name="confirmPassword"
+              label="Konfirmasi Kata Sandi"
+              type="password"
+              required
+              placeholder="Masukkan ulang kata sandi"
+              data-testid="auth-register-confirm-password"
+            />
+
 
             <Button
               type="submit"

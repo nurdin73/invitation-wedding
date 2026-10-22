@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{subject}}</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #FAF8F5;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: #3A302C;
+      -webkit-font-smoothing: antialiased;
+    }
+    .email-wrapper {
+      width: 100%;
+      background-color: #FAF8F5;
+      padding: 32px 16px;
+    }
+    .email-container {
+      max-width: 580px;
+      margin: 0 auto;
+      background-color: #FFFFFF;
+      border: 1px solid #ECE5DE;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(58, 48, 44, 0.04);
+    }
+    .email-header {
+      padding: 28px 32px 20px;
+      border-bottom: 1px solid #ECE5DE;
+      background-color: #FAF8F5;
+      text-align: center;
+    }
+    .brand-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: #3A302C;
+      letter-spacing: -0.01em;
+      margin: 0;
+    }
+    .email-body {
+      padding: 32px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #73635C;
+    }
+    .email-footer {
+      padding: 24px 32px;
+      background-color: #FAF8F5;
+      border-top: 1px solid #ECE5DE;
+      text-align: center;
+      font-size: 12px;
+      color: #A89B95;
+      line-height: 1.5;
+    }
+    .cta-button {
+      display: inline-block;
+      background-color: #B86B70;
+      color: #FFFFFF !important;
+      text-decoration: none;
+      padding: 12px 28px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 14px;
+      text-align: center;
+      transition: background-color 0.2s ease;
+    }
+  </style>
+</head>
+<body>
+  <div class="email-wrapper">
+    <div class="email-container">
+      <div class="email-header">
+        <h1 class="brand-title">{{appName}}</h1>
+      </div>
+      <div class="email-body">
+        {{{bodyContent}}}
+      </div>
+      <div class="email-footer">
+        <p style="margin: 0 0 8px;">
+          Email ini dikirim secara otomatis oleh <strong>{{appName}}</strong>. Jangan membalas email ini secara langsung.
+        </p>
+        <p style="margin: 0;">
+          &copy; {{currentYear}} {{appName}}. Seluruh hak cipta dilindungi.
+        </p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

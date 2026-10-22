@@ -11,13 +11,11 @@ import { Button } from '@/components/ui/button';
 import { FormController } from '@/components/ui/form-controller';
 import { validateWithZod } from '@/lib/zod-formik';
 import { authApi } from '@/services/api/auth.api';
+import { passwordComplexitySchema } from '@/lib/password-schema';
 
 const resetPasswordSchema = z
   .object({
-    password: z
-      .string()
-      .min(1, 'Kata sandi baru wajib diisi.')
-      .min(8, 'Kata sandi minimal 8 karakter.'),
+    password: passwordComplexitySchema,
     confirmPassword: z
       .string()
       .min(1, 'Konfirmasi kata sandi wajib diisi.'),
@@ -26,6 +24,7 @@ const resetPasswordSchema = z
     message: 'Konfirmasi kata sandi tidak cocok.',
     path: ['confirmPassword'],
   });
+
 
 type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;
 
@@ -124,18 +123,20 @@ function ResetPasswordFormContent() {
                 label="Kata Sandi Baru"
                 type="password"
                 required
-                placeholder="Minimal 8 karakter"
+                placeholder="Min. 8 karakter (huruf besar, angka & simbol)"
                 data-testid="auth-reset-password"
               />
 
+
               <FormController
                 name="confirmPassword"
-                label="Ulangi Kata Sandi Baru"
+                label="Konfirmasi Kata Sandi Baru"
                 type="password"
                 required
-                placeholder="Masukkan ulang kata sandi"
+                placeholder="Masukkan ulang kata sandi baru"
                 data-testid="auth-reset-confirm-password"
               />
+
 
               <Button
                 type="submit"

@@ -5,6 +5,9 @@ import { authMacro } from '../middlewares/auth.macro';
 
 const controller = new AuthController(registry.authService);
 
+// Kombinasi wajib: minimal 8 karakter, 1 huruf kecil, 1 huruf besar, 1 angka, 1 karakter khusus
+const PASSWORD_REGEX = '^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z0-9]).{8,}$';
+
 export const authRoutes = new Elysia({ prefix: '/auth' })
   .use(authMacro)
   .post(
@@ -25,7 +28,11 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
     {
       body: t.Object({
         email: t.String({ format: 'email' }),
-        password: t.String({ minLength: 8 }),
+        password: t.String({
+          minLength: 8,
+          pattern: PASSWORD_REGEX,
+          error: 'Kata sandi harus minimal 8 karakter dan mengandung kombinasi huruf besar, huruf kecil, angka, serta karakter khusus.',
+        }),
         fullName: t.String({ minLength: 2 }),
         role: t.Optional(t.Union([t.Literal('USER'), t.Literal('CONTRIBUTOR')])),
       }),
@@ -35,6 +42,7 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
       },
     }
   )
+
   .post(
     '/login',
     async ({ body, jwt }) => {
@@ -109,8 +117,13 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
     {
       body: t.Object({
         token: t.String({ minLength: 10 }),
-        newPassword: t.String({ minLength: 8 }),
+        newPassword: t.String({
+          minLength: 8,
+          pattern: PASSWORD_REGEX,
+          error: 'Kata sandi baru harus minimal 8 karakter dan mengandung kombinasi huruf besar, huruf kecil, angka, serta karakter khusus.',
+        }),
       }),
+
       detail: {
         tags: ['Authentication'],
         summary: 'Menyimpan kata sandi baru menggunakan token reset',

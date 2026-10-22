@@ -1,0 +1,23 @@
+<h2 style="color: #3A302C; margin: 0 0 16px; font-size: 20px; font-weight: 600;">Halo {{fullName}},</h2>
+
+<p style="margin: 0 0 16px;">
+  Terima kasih telah mendaftar di <strong>{{appName}}</strong>{{#if roleLabel}} sebagai <em>{{roleLabel}}</em>{{/if}}.
+  Silakan konfirmasi alamat email Anda dengan menekan tombol di bawah ini:
+</p>
+
+<div style="margin: 28px 0; text-align: center;">
+  <a href="{{{verificationUrl}}}" class="cta-button" target="_blank" rel="noopener noreferrer">
+    Verifikasi Email Saya
+  </a>
+</div>
+
+<p style="margin: 0 0 12px; font-size: 13px; color: #73635C;">
+  Jika tombol di atas tidak berfungsi, Anda juga dapat menyalin tautan berikut ke peramban Anda:
+</p>
+<p style="margin: 0 0 24px; font-size: 12px; word-break: break-all; color: #B86B70; background-color: #FAF8F5; padding: 10px 14px; border-radius: 8px; border: 1px solid #ECE5DE;">
+  <a href="{{{verificationUrl}}}" style="color: #B86B70; text-decoration: underline;" target="_blank" rel="noopener noreferrer">{{{verificationUrl}}}</a>
+</p>
+
+<p style="margin: 0; font-size: 12px; color: #A89B95;">
+  Tautan verifikasi ini berlaku selama 24 jam. Jika Anda tidak merasa mendaftar di akun {{appName}}, Anda dapat mengabaikan email ini dengan aman.
+</p>
