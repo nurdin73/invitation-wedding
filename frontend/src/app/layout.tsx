@@ -35,6 +35,7 @@ export default function RootLayout({
   return (
     <html
       lang="id"
+      data-scroll-behavior="smooth"
       className={`scroll-smooth scroll-pt-20 ${plusJakartaSans.variable} ${playfairDisplay.variable} ${jetbrainsMono.variable}`}
     >
       <body
