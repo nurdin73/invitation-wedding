@@ -1,7 +1,8 @@
+import fs from 'node:fs';
 import Handlebars from 'handlebars';
 import { env } from '../../configs/env';
-import baseLayoutSource from './base-layout.hbs' with { type: 'text' };
-import resetPasswordBodySource from './reset-password.template.hbs' with { type: 'text' };
+import baseLayoutPath from './base-layout.hbs';
+import resetPasswordBodyPath from './reset-password.template.hbs';
 import type { RenderedEmail } from './verification.template';
 
 export interface ResetPasswordEmailContext {
@@ -10,6 +11,10 @@ export interface ResetPasswordEmailContext {
   appName?: string;
   expiresIn?: string;
 }
+
+// Read raw HTML templates from file paths
+const baseLayoutSource = fs.readFileSync(baseLayoutPath, 'utf8');
+const resetPasswordBodySource = fs.readFileSync(resetPasswordBodyPath, 'utf8');
 
 // Pre-compiled Handlebars templates
 const compiledBaseLayout = Handlebars.compile(baseLayoutSource);

@@ -1,7 +1,8 @@
+import fs from 'node:fs';
 import Handlebars from 'handlebars';
 import { env } from '../../configs/env';
-import baseLayoutSource from './base-layout.hbs' with { type: 'text' };
-import verificationBodySource from './verification.template.hbs' with { type: 'text' };
+import baseLayoutPath from './base-layout.hbs';
+import verificationBodyPath from './verification.template.hbs';
 
 import type { UserRole } from '../../db/schema/users.schema';
 
@@ -17,6 +18,10 @@ export interface RenderedEmail {
   html: string;
   text: string;
 }
+
+// Read raw HTML templates from file paths
+const baseLayoutSource = fs.readFileSync(baseLayoutPath, 'utf8');
+const verificationBodySource = fs.readFileSync(verificationBodyPath, 'utf8');
 
 // Pre-compiled Handlebars templates (in-memory for maximum throughput)
 const compiledBaseLayout = Handlebars.compile(baseLayoutSource);
