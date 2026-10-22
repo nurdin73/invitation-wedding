@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Compass, Home, LayoutDashboard, Sparkles } from 'lucide-react';
+import { Home, LayoutDashboard, Sparkles } from 'lucide-react';
 import { buttonVariants } from '@/components/ui/button';
 import { siteConfig } from '@/config/site';
 import { cn } from '@/lib/utils';
@@ -52,7 +52,7 @@ export default function UniversalNotFound() {
             data-testid="not-found-title"
             className="font-heading text-2xl sm:text-3xl lg:text-4xl font-semibold tracking-tight text-foreground"
           >
-            Halaman yang Anda Tuju Tidak Tersedia
+            Halaman Tidak Ditemukan
           </h2>
         </div>
 
@@ -61,8 +61,7 @@ export default function UniversalNotFound() {
           data-testid="not-found-description"
           className="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-xl mb-10"
         >
-          Alamat URL yang Anda tuju mungkin salah ketik, telah dipindahkan ke tautan baru, atau
-          sudah tidak lagi aktif di server kami.
+          Halaman yang Anda cari tidak dapat ditemukan atau sudah tidak tersedia.
         </p>
 
         {/* Action Buttons */}
