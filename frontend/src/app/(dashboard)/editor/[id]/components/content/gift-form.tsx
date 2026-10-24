@@ -5,12 +5,29 @@ import { useInvitationEditorStore } from '@/lib/stores/invitation-editor.store';
 import { CreditCard, Plus, Trash2, Gift } from 'lucide-react';
 import type { BankAccountItem } from '@/modules/invitation-sections/types';
 import { Button } from '@/components/ui/button';
+import { ProFeatureLock } from '../pro/pro-feature-lock';
 
 const POPULAR_BANKS = ['BCA', 'Mandiri', 'BRI', 'BNI', 'BSI', 'CIMB Niaga', 'Bank Jago', 'Jenius', 'GoPay', 'OVO', 'DANA'];
 
 export const GiftForm: React.FC = () => {
   const gift = useInvitationEditorStore((s) => s.content.gift);
   const updateGift = useInvitationEditorStore((s) => s.updateGift);
+  const isPro = useInvitationEditorStore((s) => s.isPro);
+
+  if (!isPro) {
+    return (
+      <ProFeatureLock
+        featureName="Tanda Kasih & Amplop Digital"
+        description="Fitur amplop digital dan rekening bank eksklusif untuk pengguna paket PRO. Tamu dapat mengirimkan hadiah pernikahan secara cashless langsung ke rekening bank atau e-wallet Anda."
+        perks={[
+          'Nomor rekening bank & e-wallet lengkap dengan tombol salin cepat',
+          'Dukungan barcode QRIS untuk kemudahan transfer instan tamu',
+          'Pencatatan konfirmasi pengiriman amplop dari para tamu',
+          'Alamat pengiriman kado fisik bagi tamu yang ingin mengirim hadiah langsung',
+        ]}
+      />
+    );
+  }
 
   const handleAddAccount = () => {
     const newAccount: BankAccountItem = {

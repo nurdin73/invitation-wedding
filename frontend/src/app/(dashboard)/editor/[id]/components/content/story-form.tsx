@@ -5,10 +5,27 @@ import { useInvitationEditorStore } from '@/lib/stores/invitation-editor.store';
 import { Heart, Plus, Trash2 } from 'lucide-react';
 import type { StoryTimelineItem } from '@/modules/invitation-sections/types';
 import { Button } from '@/components/ui/button';
+import { ProFeatureLock } from '../pro/pro-feature-lock';
 
 export const StoryForm: React.FC = () => {
   const story = useInvitationEditorStore((s) => s.content.story);
   const updateStory = useInvitationEditorStore((s) => s.updateStory);
+  const isPro = useInvitationEditorStore((s) => s.isPro);
+
+  if (!isPro) {
+    return (
+      <ProFeatureLock
+        featureName="Linimasa Kisah Cinta (Love Story)"
+        description="Fitur linimasa kisah cinta eksklusif untuk pengguna paket PRO. Ceritakan kembali momen-momen berkesan mulai dari perkenalan, kencan pertama, hingga lamaran."
+        perks={[
+          'Tampilan kronologis perjalanan cinta yang estetik dan rapi',
+          'Penanda tahun dan judul momen kebersamaan yang interaktif',
+          'Animasi kartu linimasa yang memukau para tamu undangan',
+          'Penyusunan urutan cerita bebas tanpa batasan jumlah',
+        ]}
+      />
+    );
+  }
 
   const handleAddStory = () => {
     const newItem: StoryTimelineItem = {

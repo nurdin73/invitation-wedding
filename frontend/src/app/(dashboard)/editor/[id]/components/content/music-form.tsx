@@ -5,10 +5,27 @@ import { useInvitationEditorStore } from '@/lib/stores/invitation-editor.store';
 import { Music2, Sparkles, Check } from 'lucide-react';
 import { AUDIO_PRESETS } from '@/modules/invitation-sections/audio-presets';
 import { AudioUploader } from '@/components/media/audio-uploader';
+import { ProFeatureLock } from '../pro/pro-feature-lock';
 
 export const MusicForm: React.FC = () => {
   const music = useInvitationEditorStore((s) => s.content.music);
   const updateMusic = useInvitationEditorStore((s) => s.updateMusic);
+  const isPro = useInvitationEditorStore((s) => s.isPro);
+
+  if (!isPro) {
+    return (
+      <ProFeatureLock
+        featureName="Musik Latar Pengiring Romantis"
+        description="Fitur musik latar pengiring eksklusif untuk pengguna paket PRO. Tamu undangan Anda akan disambut lantunan musik syahdu saat menekan tombol 'Buka Undangan'."
+        perks={[
+          'Pemutar musik otomatis saat cover undangan dibuka',
+          'Tersedia koleksi lagu instrumen romantis siap pakai',
+          'Dukungan unggah file MP3 lagu pilihan Anda sendiri',
+          'Tombol kontrol audio melayang yang elegan bagi tamu',
+        ]}
+      />
+    );
+  }
 
   const handleSelectPreset = (url: string) => {
     updateMusic({

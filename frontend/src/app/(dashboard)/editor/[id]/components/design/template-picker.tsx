@@ -12,6 +12,7 @@ import type { SectionNode, ThemeConfig } from '@/modules/invitation-sections/typ
 export const TemplatePicker: React.FC = () => {
   const invitation = useInvitationEditorStore((s) => s.invitation);
   const themeConfig = useInvitationEditorStore((s) => s.themeConfig);
+  const isPro = useInvitationEditorStore((s) => s.isPro);
   const applyTemplateLocally = useInvitationEditorStore((s) => s.applyTemplateLocally);
 
   const [templates, setTemplates] = React.useState<TemplateData[]>([]);
@@ -91,6 +92,7 @@ export const TemplatePicker: React.FC = () => {
             const isCurrentPalette = themeConfig?.paletteId === tpl.themeConfig?.paletteId;
             const primaryColor = (tpl.themeConfig?.primaryColor as string) || '#B86B70';
             const canvasBg = (tpl.themeConfig?.canvasBackground as string) || '#FAF8F5';
+            const isTemplatePro = tpl.slug !== 'classic-dusty-rose';
 
             return (
               <div
@@ -116,9 +118,17 @@ export const TemplatePicker: React.FC = () => {
                     </div>
 
                     <div>
-                      <span className="text-[9px] font-semibold text-primary uppercase tracking-wider block">
-                        {tpl.category}
-                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[9px] font-semibold text-primary uppercase tracking-wider block">
+                          {tpl.category}
+                        </span>
+                        {isTemplatePro && (
+                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded-full bg-[#DFB15B]/20 text-[#DFB15B] text-[8px] font-bold tracking-wider">
+                            <Sparkles className="w-2.5 h-2.5" />
+                            <span>PRO</span>
+                          </span>
+                        )}
+                      </div>
                       <h5 className="font-semibold text-xs text-foreground leading-snug">
                         {tpl.name}
                       </h5>
@@ -157,7 +167,11 @@ export const TemplatePicker: React.FC = () => {
         open={isConfirmOpen}
         onOpenChange={setIsConfirmOpen}
         title={`Terapkan Template "${selectedTemplate?.name}"?`}
-        description="Gaya visual, palet warna, tipografi, dan susunan bagian akan diperbarui mengikuti template ini. Seluruh data mempelai, jadwal acara, dan foto galeri yang sudah Anda input TETAP AMAN dan tidak akan hilang."
+        description={
+          !isPro && selectedTemplate?.slug !== 'classic-dusty-rose'
+            ? `Template "${selectedTemplate?.name}" termasuk dalam katalog tema PRO. Anda dapat mencoba dan mendesainnya dalam draf secara gratis, namun akun Anda perlu ditingkatkan ke paket PRO saat ingin mempublikasikannya. Seluruh data yang sudah Anda isi tetap aman.`
+            : 'Gaya visual, palet warna, tipografi, dan susunan bagian akan diperbarui mengikuti template ini. Seluruh data mempelai, jadwal acara, dan foto galeri yang sudah Anda input TETAP AMAN dan tidak akan hilang.'
+        }
         confirmLabel={isApplying ? 'Menerapkan...' : 'Ya, Terapkan Desain Ini'}
         cancelLabel="Batal"
         isLoading={isApplying}

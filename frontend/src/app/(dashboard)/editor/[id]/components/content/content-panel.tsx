@@ -33,6 +33,7 @@ interface SectionGroup {
   icon: React.ComponentType<{ className?: string }>;
   component: React.ComponentType;
   isRequired?: boolean;
+  isPro?: boolean;
 }
 
 const SECTION_GROUPS: SectionGroup[] = [
@@ -62,7 +63,7 @@ const SECTION_GROUPS: SectionGroup[] = [
   {
     key: 'gallery',
     title: 'Galeri Foto Kenangan',
-    subtitle: 'Unggah momen pre-wedding dan kebersamaan',
+    subtitle: 'Unggah momen pre-wedding (Maks. 4 foto Starter)',
     icon: ImageIcon,
     component: GalleryForm,
   },
@@ -72,6 +73,7 @@ const SECTION_GROUPS: SectionGroup[] = [
     subtitle: 'Rekening bank, e-wallet, atau alamat kirim kado',
     icon: Gift,
     component: GiftForm,
+    isPro: true,
   },
   {
     key: 'music',
@@ -79,6 +81,7 @@ const SECTION_GROUPS: SectionGroup[] = [
     subtitle: 'Audio pengiring suasana syahdu pernikahan',
     icon: Music2,
     component: MusicForm,
+    isPro: true,
   },
   {
     key: 'story',
@@ -86,6 +89,7 @@ const SECTION_GROUPS: SectionGroup[] = [
     subtitle: 'Rangkaian cerita perjalanan cinta Anda',
     icon: Heart,
     component: StoryForm,
+    isPro: true,
   },
 ];
 
@@ -198,6 +202,12 @@ export const ContentPanel: React.FC = () => {
                       </h4>
                       {group.isRequired && (
                         <span className="text-[10px] text-destructive font-bold">*</span>
+                      )}
+                      {group.isPro && (
+                        <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-[#DFB15B]/20 text-[#DFB15B] text-[9px] font-bold tracking-wider">
+                          <Sparkles className="w-2.5 h-2.5" />
+                          <span>PRO</span>
+                        </span>
                       )}
                     </div>
                     <p className="text-[10px] text-muted-foreground truncate">

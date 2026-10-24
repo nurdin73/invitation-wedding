@@ -17,7 +17,12 @@ export const InvitationAudioPlayer: React.FC<InvitationAudioPlayerProps> = ({
   audioUrl,
 }) => {
   const audioRef = React.useRef<HTMLAudioElement | null>(null);
-  const activeUrl = audioUrl?.trim() || AUDIO_PRESETS[0].url;
+
+  if (!audioUrl || !audioUrl.trim()) {
+    return null;
+  }
+
+  const activeUrl = audioUrl.trim();
 
   // Sinkronisasi state pemutaran audio dengan elemen HTMLAudioElement
   React.useEffect(() => {

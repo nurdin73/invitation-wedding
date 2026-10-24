@@ -12,6 +12,7 @@ import type {
 import {
   createDefaultInvitationContent,
   mergeTemplateLayout,
+  validateProFeaturesUsage,
 } from './helpers/invitation-content.helper';
 
 export class InvitationServiceImplement implements IInvitationService {
@@ -182,6 +183,19 @@ export class InvitationServiceImplement implements IInvitationService {
         'Mohon lengkapi nama mempelai wanita di tab Isi Data sebelum mempublikasikan undangan.',
         422
       );
+    }
+
+    // Validasi fitur PRO vs status langganan pengguna
+    const subStatus = await this.billingService.getSubscriptionStatus(userId);
+    if (!subStatus.isSubscriberActive) {
+      const proCheck = validateProFeaturesUsage(invitation.content, invitation.themeConfig);
+      if (proCheck.isProRequired) {
+        throw new AppDomainError(
+          META_CODES.SUBSCRIPTION_INACTIVE,
+          `Fitur ${proCheck.violatedFeatures.join(', ')} memerlukan paket PRO aktif. Silakan upgrade paket Anda untuk mempublikasikan undangan ini.`,
+          403
+        );
+      }
     }
 
     // Hanya 1 undangan yang dipublikasikan per akun

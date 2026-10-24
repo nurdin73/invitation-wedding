@@ -22,6 +22,7 @@ export const EditorViewportCanvas: React.FC = () => {
   const moveSection = useInvitationEditorStore((s) => s.moveSection);
   const duplicateSection = useInvitationEditorStore((s) => s.duplicateSection);
   const deleteSection = useInvitationEditorStore((s) => s.deleteSection);
+  const isPro = useInvitationEditorStore((s) => s.isPro);
 
   // Status Cover Gate (di editor default dibuka agar langsung bisa edit, tapi bisa diuji via toolbar)
   const [isCoverOpen, setIsCoverOpen] = React.useState(true);
@@ -132,7 +133,7 @@ export const EditorViewportCanvas: React.FC = () => {
           <InvitationAudioPlayer
             isPlaying={isPlayingAudio}
             onTogglePlay={() => setIsPlayingAudio((prev) => !prev)}
-            audioUrl={content.music?.audioUrl || themeConfig.audioUrl}
+            audioUrl={isPro ? (content.music?.audioUrl || themeConfig.audioUrl) : undefined}
           />
         </div>
       </div>

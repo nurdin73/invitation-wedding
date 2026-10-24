@@ -2,6 +2,7 @@
 
 import { create } from 'zustand';
 import type { InvitationData } from '@/services/api/invitations.api';
+import type { SubscriptionInfo } from '@/services/api/billing.api';
 import type {
   SectionNode,
   SectionType,
@@ -59,6 +60,13 @@ interface EditorState {
   setSaving: (saving: boolean) => void;
   setPublishing: (publishing: boolean) => void;
   markSaved: (updatedInvitation: InvitationData) => void;
+
+  // Subscription & Pro status
+  subscription: SubscriptionInfo | null;
+  isPro: boolean;
+  isUpgradeModalOpen: boolean;
+  setSubscription: (sub: SubscriptionInfo | null) => void;
+  setUpgradeModalOpen: (open: boolean) => void;
 }
 
 function getDefaultSectionCopy(type: SectionType): SectionCopyMap[SectionType] {
@@ -178,6 +186,9 @@ export const useInvitationEditorStore = create<EditorState>((set, get) => ({
   isDirty: false,
   isSaving: false,
   isPublishing: false,
+  subscription: null,
+  isPro: false,
+  isUpgradeModalOpen: false,
 
   initEditor: (invitation: InvitationData) => {
     // 1. Ekstrak canonical content
@@ -439,5 +450,16 @@ export const useInvitationEditorStore = create<EditorState>((set, get) => ({
       isDirty: false,
       isSaving: false,
     });
+  },
+
+  setSubscription: (sub: SubscriptionInfo | null) => {
+    set({
+      subscription: sub,
+      isPro: sub?.isSubscriberActive ?? false,
+    });
+  },
+
+  setUpgradeModalOpen: (isUpgradeModalOpen: boolean) => {
+    set({ isUpgradeModalOpen });
   },
 }));

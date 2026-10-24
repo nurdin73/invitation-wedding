@@ -170,3 +170,46 @@ export function mergeTemplateLayout(
     };
   });
 }
+
+export interface ProValidationResult {
+  isProRequired: boolean;
+  violatedFeatures: string[];
+}
+
+export function validateProFeaturesUsage(
+  rawContent: unknown,
+  rawThemeConfig?: unknown
+): ProValidationResult {
+  const content = (rawContent || {}) as Partial<InvitationContent>;
+  const themeConfig = (rawThemeConfig || {}) as Record<string, unknown>;
+  const violatedFeatures: string[] = [];
+
+  // 1. Musik latar pengiring
+  const hasMusic = Boolean(content.music?.audioUrl || themeConfig.audioUrl);
+  if (hasMusic) {
+    violatedFeatures.push('Musik Latar Pengiring');
+  }
+
+  // 2. Rekening & Amplop Digital
+  const hasGiftAccounts = Boolean(content.gift?.accounts && content.gift.accounts.length > 0);
+  if (hasGiftAccounts) {
+    violatedFeatures.push('Tanda Kasih / Amplop Digital');
+  }
+
+  // 3. Linimasa Kisah Cinta
+  const hasStory = Boolean(content.story && content.story.length > 0);
+  if (hasStory) {
+    violatedFeatures.push('Linimasa Kisah Cinta');
+  }
+
+  // 4. Kuota Galeri Foto > 4
+  const galleryCount = content.gallery?.length || 0;
+  if (galleryCount > 4) {
+    violatedFeatures.push(`Galeri Foto (${galleryCount} foto, Starter maks 4)`);
+  }
+
+  return {
+    isProRequired: violatedFeatures.length > 0,
+    violatedFeatures,
+  };
+}

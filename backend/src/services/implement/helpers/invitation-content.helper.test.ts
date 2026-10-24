@@ -2,6 +2,7 @@ import { describe, expect, it } from 'bun:test';
 import {
   createDefaultInvitationContent,
   mergeTemplateLayout,
+  validateProFeaturesUsage,
   type SectionNodeData,
 } from './invitation-content.helper';
 
@@ -79,5 +80,53 @@ describe('Invitation Content Helper', () => {
     const gallery = merged.find((s) => s.type === 'gallery');
     expect(gallery?.variant).toBe('masonry');
     expect(gallery?.isVisible).toBe(true);
+  });
+
+  describe('validateProFeaturesUsage', () => {
+    it('returns isProRequired: false for compliant Starter content', () => {
+      const starterContent = {
+        couple: {
+          groom: { fullName: 'Rama', nickname: 'Rama', parents: '' },
+          bride: { fullName: 'Shinta', nickname: 'Shinta', parents: '' },
+        },
+        events: [{ id: '1', eventName: 'Akad', date: '2026-10-25', timeRange: '', venueName: '', venueAddress: '' }],
+        quote: { quoteText: '', sourceText: '' },
+        gallery: [
+          { id: '1', url: 'https://example.com/1.jpg' },
+          { id: '2', url: 'https://example.com/2.jpg' },
+        ],
+        story: [],
+        gift: { accounts: [] },
+        music: { audioUrl: '', isAutoplay: false },
+      };
+
+      const result = validateProFeaturesUsage(starterContent, {});
+      expect(result.isProRequired).toBe(false);
+      expect(result.violatedFeatures).toHaveLength(0);
+    });
+
+    it('identifies Pro features (music, gift accounts, story, gallery > 4)', () => {
+      const proContent = {
+        gallery: [
+          { id: '1', url: '1.jpg' },
+          { id: '2', url: '2.jpg' },
+          { id: '3', url: '3.jpg' },
+          { id: '4', url: '4.jpg' },
+          { id: '5', url: '5.jpg' },
+        ],
+        gift: {
+          accounts: [{ id: '1', bankName: 'BCA', accountNumber: '12345678', accountHolder: 'Rama' }],
+        },
+        story: [{ id: '1', year: '2020', title: 'Pertama Bertemu', story: '...' }],
+        music: { audioUrl: 'https://example.com/audio.mp3', isAutoplay: true },
+      };
+
+      const result = validateProFeaturesUsage(proContent, {});
+      expect(result.isProRequired).toBe(true);
+      expect(result.violatedFeatures).toContain('Musik Latar Pengiring');
+      expect(result.violatedFeatures).toContain('Tanda Kasih / Amplop Digital');
+      expect(result.violatedFeatures).toContain('Linimasa Kisah Cinta');
+      expect(result.violatedFeatures.some((f) => f.includes('Galeri Foto'))).toBe(true);
+    });
   });
 });

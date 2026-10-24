@@ -3,12 +3,14 @@
 import * as React from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { Save, Send, Globe } from 'lucide-react';
+import { Save, Send, Globe, Sparkles } from 'lucide-react';
 import { invitationsApi } from '@/services/api/invitations.api';
+import { billingApi } from '@/services/api/billing.api';
 import { useDashboardHeaderStore } from '@/lib/stores/dashboard-header.store';
 import { useInvitationEditorStore } from '@/lib/stores/invitation-editor.store';
 import { EditorLeftPanel } from './components/editor-left-panel';
 import { EditorViewportCanvas } from './components/editor-viewport-canvas';
+import { ProUpgradeDialog } from './components/pro/pro-upgrade-dialog';
 
 export default function EditorPage() {
   const params = useParams();
@@ -24,6 +26,9 @@ export default function EditorPage() {
   const isSaving = useInvitationEditorStore((s) => s.isSaving);
   const isPublishing = useInvitationEditorStore((s) => s.isPublishing);
   const isDirty = useInvitationEditorStore((s) => s.isDirty);
+  const isPro = useInvitationEditorStore((s) => s.isPro);
+  const setSubscription = useInvitationEditorStore((s) => s.setSubscription);
+  const setUpgradeModalOpen = useInvitationEditorStore((s) => s.setUpgradeModalOpen);
   const initEditor = useInvitationEditorStore((s) => s.initEditor);
   const setSaving = useInvitationEditorStore((s) => s.setSaving);
   const setPublishing = useInvitationEditorStore((s) => s.setPublishing);
@@ -32,9 +37,22 @@ export default function EditorPage() {
   const setHeader = useDashboardHeaderStore((s) => s.setHeader);
   const resetHeader = useDashboardHeaderStore((s) => s.resetHeader);
 
-  // 1. Inisialisasi data undangan
+  // 1. Inisialisasi data undangan & status langganan
   React.useEffect(() => {
     let isMounted = true;
+
+    // Ambil status langganan pengguna
+    billingApi
+      .getSubscription()
+      .then((subRes) => {
+        if (isMounted && subRes.data) {
+          setSubscription(subRes.data);
+        }
+      })
+      .catch(() => {
+        // Fallback default free
+      });
+
     invitationsApi
       .getById(invitationId)
       .then((res) => {
@@ -53,7 +71,7 @@ export default function EditorPage() {
     return () => {
       isMounted = false;
     };
-  }, [invitationId, initEditor, router]);
+  }, [invitationId, initEditor, setSubscription, router]);
 
   // 2. Action: Simpan Draft
   const handleSaveDraft = React.useCallback(async () => {
@@ -111,6 +129,21 @@ export default function EditorPage() {
       showBackButton: true,
       backButtonHref: '/dashboard',
       actions: [
+        ...(!isPro
+          ? [
+              {
+                type: 'button' as const,
+                button: {
+                  id: 'editor-upgrade-pro',
+                  label: 'Upgrade PRO',
+                  icon: Sparkles,
+                  variant: 'outline' as const,
+                  onClick: () => setUpgradeModalOpen(true),
+                  dataTestId: 'editor-topbar-upgrade-btn',
+                },
+              },
+            ]
+          : []),
         {
           type: 'button',
           button: {
@@ -163,7 +196,7 @@ export default function EditorPage() {
     return () => {
       resetHeader();
     };
-  }, [invitation, isDirty, isSaving, isPublishing, handleSaveDraft, handleTogglePublish, setHeader, resetHeader]);
+  }, [invitation, isDirty, isSaving, isPublishing, isPro, handleSaveDraft, handleTogglePublish, setHeader, resetHeader, setUpgradeModalOpen]);
 
   if (isLoading || !invitation) {
     return (
@@ -174,12 +207,15 @@ export default function EditorPage() {
   }
 
   return (
-    <div
-      className="flex flex-col lg:flex-row h-[calc(100vh-7.5rem)] w-full rounded-xl border border-border overflow-hidden bg-background shadow-xs"
-      data-testid="editor-page-orchestrator"
-    >
-      <EditorLeftPanel />
-      <EditorViewportCanvas />
-    </div>
+    <>
+      <div
+        className="flex flex-col lg:flex-row h-[calc(100vh-7.5rem)] w-full rounded-xl border border-border overflow-hidden bg-background shadow-xs"
+        data-testid="editor-page-orchestrator"
+      >
+        <EditorLeftPanel />
+        <EditorViewportCanvas />
+      </div>
+      <ProUpgradeDialog />
+    </>
   );
 }
