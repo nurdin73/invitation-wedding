@@ -112,7 +112,7 @@ export const EditorAddSectionModal: React.FC<EditorAddSectionModalProps> = ({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid sm:grid-cols-2 gap-3 pt-2">
+        <div className="grid sm:grid-cols-3 gap-3 pt-2">
           {SECTION_CATALOG.map((item) => {
             const Icon = item.icon;
             return (
