@@ -1,17 +1,19 @@
 'use client';
 
 import * as React from 'react';
-import type { SectionRenderProps, GallerySectionData } from '../../types';
+import type { SectionRenderProps } from '../../types';
 import { Image as ImageIcon } from 'lucide-react';
 
-export const GalleryGrid: React.FC<SectionRenderProps<'gallery'>> = ({ data }) => {
-  const gallery = data as GallerySectionData;
-  const images = gallery.images && gallery.images.length > 0 ? gallery.images : [];
+export const GalleryGrid: React.FC<SectionRenderProps<'gallery'>> = ({
+  content,
+  copy,
+}) => {
+  const images = (content?.gallery && content.gallery.length > 0) ? content.gallery : [];
 
   return (
     <section
       data-testid="section-gallery-grid"
-      className="relative w-full py-16 px-6 text-center space-y-6 flex flex-col justify-center items-center min-h-[100dvh] min-h-screen"
+      className="relative w-full py-16 px-6 text-center space-y-6 flex flex-col justify-center items-center min-h-[60vh]"
       style={{
         backgroundColor: 'var(--inv-bg, #FAF8F5)',
         color: 'var(--inv-font-body, #3A302C)',
@@ -25,14 +27,14 @@ export const GalleryGrid: React.FC<SectionRenderProps<'gallery'>> = ({ data }) =
             color: 'var(--inv-primary, #B86B70)',
           }}
         >
-          {gallery.title || 'Momen Bahagia'}
+          {copy?.title || 'Momen Bahagia'}
         </h2>
-        <p className="text-xs opacity-70">
-          {gallery.subtitle || 'Galeri potret kenangan kebersamaan kami'}
+        <p className="text-xs opacity-70 max-w-sm mx-auto">
+          {copy?.subtitle || 'Galeri potret kenangan kebersamaan kami'}
         </p>
       </div>
 
-      <div className="max-w-sm mx-auto">
+      <div className="max-w-sm mx-auto w-full">
         {images.length === 0 ? (
           <div className="rounded-xl border border-dashed border-current/20 p-8 text-center opacity-60">
             <ImageIcon className="w-8 h-8 mx-auto mb-2 text-[var(--inv-primary)]" />

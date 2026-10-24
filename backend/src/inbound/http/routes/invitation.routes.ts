@@ -56,6 +56,9 @@ export const invitationRoutes = new Elysia({ prefix: '/invitations' })
         userId: user.id,
         title: body.title,
         slug: body.slug,
+        templateId: body.templateId,
+        groomNickname: body.groomNickname,
+        brideNickname: body.brideNickname,
       });
     },
     {
@@ -63,6 +66,9 @@ export const invitationRoutes = new Elysia({ prefix: '/invitations' })
       body: t.Object({
         title: t.String({ minLength: 3 }),
         slug: t.String({ minLength: 3 }),
+        templateId: t.Optional(t.String()),
+        groomNickname: t.Optional(t.String()),
+        brideNickname: t.Optional(t.String()),
       }),
       detail: {
         tags: ['Invitations'],
@@ -77,6 +83,7 @@ export const invitationRoutes = new Elysia({ prefix: '/invitations' })
         userId: user.id,
         invitationId: params.id,
         themeConfig: body.themeConfig,
+        content: body.content,
         sections: body.sections,
       });
     },
@@ -84,12 +91,30 @@ export const invitationRoutes = new Elysia({ prefix: '/invitations' })
       isAuth: true,
       params: t.Object({ id: t.String() }),
       body: t.Object({
-        themeConfig: t.Record(t.String(), t.Unknown()),
-        sections: t.Array(t.Unknown()),
+        themeConfig: t.Optional(t.Record(t.String(), t.Unknown())),
+        content: t.Optional(t.Record(t.String(), t.Unknown())),
+        sections: t.Optional(t.Array(t.Unknown())),
       }),
       detail: {
         tags: ['Invitations'],
-        summary: 'Menyimpan konfigurasi tema dan daftar section kanvas editor',
+        summary: 'Menyimpan konfigurasi tema, konten, dan daftar section kanvas editor',
+      },
+    }
+  )
+  .post(
+    '/:id/apply-template',
+    async ({ user, params, body }) => {
+      return await controller.applyTemplate(user.id, params.id, body.templateId);
+    },
+    {
+      isAuth: true,
+      params: t.Object({ id: t.String() }),
+      body: t.Object({
+        templateId: t.String(),
+      }),
+      detail: {
+        tags: ['Invitations'],
+        summary: 'Menerapkan template desain ke undangan tanpa menghapus konten',
       },
     }
   )

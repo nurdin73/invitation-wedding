@@ -9,9 +9,18 @@ const ALLOWED_MIME_TYPES = new Set([
   'image/jpeg',
   'audio/mpeg',
   'audio/mp3',
+  'audio/webm',
+  'audio/ogg',
+  'audio/wav',
+  'audio/wave',
+  'audio/x-wav',
+  'audio/aac',
+  'audio/m4a',
+  'audio/x-m4a',
+  'audio/mp4',
 ]);
 
-const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
+const MAX_FILE_SIZE_BYTES = 15 * 1024 * 1024; // 15 MB
 
 export class MediaServiceImplement implements IMediaService {
   constructor(private readonly storagePort: IStoragePort) {}
@@ -25,7 +34,7 @@ export class MediaServiceImplement implements IMediaService {
     if (!ALLOWED_MIME_TYPES.has(mimeType.toLowerCase())) {
       throw new AppDomainError(
         META_CODES.UNSUPPORTED_MIME_TYPE,
-        `Tipe file "${mimeType}" tidak didukung. Format yang diizinkan: WebP, PNG, JPEG, dan MP3.`,
+        `Tipe file "${mimeType}" tidak didukung. Format yang diizinkan: WebP, PNG, JPEG, MP3, M4A, AAC, WAV, WebM, dan OGG.`,
         415
       );
     }

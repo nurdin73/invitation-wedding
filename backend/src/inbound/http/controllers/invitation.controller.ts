@@ -30,6 +30,11 @@ export class InvitationController {
     return ResponseHelper.success(result, 'Draft undangan berhasil disimpan.', META_CODES.DRAFT_SAVED);
   }
 
+  async applyTemplate(userId: string, invitationId: string, templateId: string) {
+    const result = await this.invitationService.applyTemplate({ userId, invitationId, templateId });
+    return ResponseHelper.success(result, 'Template desain berhasil diterapkan.', META_CODES.SUCCESS_OK);
+  }
+
   async publish(userId: string, invitationId: string) {
     const result = await this.invitationService.publish(userId, invitationId);
     return ResponseHelper.success(result, 'Undangan berhasil dipublikasikan.', META_CODES.INVITATION_PUBLISHED);

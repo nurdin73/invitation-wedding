@@ -18,6 +18,7 @@ export default function EditorPage() {
   const [isLoading, setIsLoading] = React.useState(true);
 
   const invitation = useInvitationEditorStore((s) => s.invitation);
+  const content = useInvitationEditorStore((s) => s.content);
   const sections = useInvitationEditorStore((s) => s.sections);
   const themeConfig = useInvitationEditorStore((s) => s.themeConfig);
   const isSaving = useInvitationEditorStore((s) => s.isSaving);
@@ -62,6 +63,7 @@ export default function EditorPage() {
       const res = await invitationsApi.saveDraft(invitation.id, {
         themeConfig: themeConfig as Record<string, unknown>,
         sections: sections as unknown[],
+        content: content as unknown as Record<string, unknown>,
       });
       if (res.data) {
         markSaved(res.data);
@@ -72,7 +74,7 @@ export default function EditorPage() {
     } finally {
       setSaving(false);
     }
-  }, [invitation, themeConfig, sections, setSaving, markSaved]);
+  }, [invitation, themeConfig, sections, content, setSaving, markSaved]);
 
   // 3. Action: Toggle Publikasi
   const handleTogglePublish = React.useCallback(async () => {

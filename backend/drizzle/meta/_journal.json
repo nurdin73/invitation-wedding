@@ -15,6 +15,20 @@
       "when": 1792670096992,
       "tag": "0001_loud_scream",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792855259370,
+      "tag": "0002_aromatic_callisto",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1792865935259,
+      "tag": "0003_absurd_gravity",
+      "breakpoints": true
     }
   ]
 }

@@ -1,17 +1,17 @@
 'use client';
 
 import * as React from 'react';
-import type { SectionRenderProps, FooterSectionData } from '../../types';
+import type { SectionRenderProps } from '../../types';
 import { Heart } from 'lucide-react';
 import { siteConfig } from '@/config/site';
 
-export const FooterClosing: React.FC<SectionRenderProps<'footer'>> = ({ data }) => {
-  const footer = data as FooterSectionData;
-
+export const FooterClosing: React.FC<SectionRenderProps<'footer'>> = ({
+  copy,
+}) => {
   return (
     <footer
       data-testid="section-footer-closing"
-      className="relative w-full py-16 px-6 text-center space-y-4 flex flex-col justify-center items-center min-h-[100dvh] min-h-screen"
+      className="relative w-full py-16 px-6 text-center space-y-4 flex flex-col justify-center items-center min-h-[60vh]"
       style={{
         backgroundColor: 'var(--inv-bg, #FAF8F5)',
         color: 'var(--inv-font-body, #3A302C)',
@@ -26,10 +26,11 @@ export const FooterClosing: React.FC<SectionRenderProps<'footer'>> = ({ data }) 
             color: 'var(--inv-primary, #B86B70)',
           }}
         >
-          {footer.closingText || 'Terima Kasih'}
+          {copy?.closingText || 'Terima Kasih'}
         </h3>
         <p className="text-xs opacity-75 leading-relaxed">
-          {footer.thankYouNote || 'Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu kepada kami.'}
+          {copy?.thankYouNote ||
+            'Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu kepada kami.'}
         </p>
       </div>
 

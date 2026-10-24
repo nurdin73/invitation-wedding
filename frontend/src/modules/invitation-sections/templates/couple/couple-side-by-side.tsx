@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import type { SectionRenderProps, CoupleSectionData } from '../../types';
+import type { SectionRenderProps } from '../../types';
 import { User } from 'lucide-react';
 
 const InstagramIcon: React.FC<{ className?: string }> = ({ className }) => (
@@ -22,8 +22,18 @@ const InstagramIcon: React.FC<{ className?: string }> = ({ className }) => (
   </svg>
 );
 
-export const CoupleSideBySide: React.FC<SectionRenderProps<'couple'>> = ({ data }) => {
-  const couple = data as CoupleSectionData;
+export const CoupleSideBySide: React.FC<SectionRenderProps<'couple'>> = ({
+  content,
+  copy,
+  isEditor,
+}) => {
+  const groom = content?.couple?.groom;
+  const bride = content?.couple?.bride;
+
+  const groomName = groom?.fullName || groom?.nickname || (isEditor ? 'Nama Lengkap Pria' : '');
+  const brideName = bride?.fullName || bride?.nickname || (isEditor ? 'Nama Lengkap Wanita' : '');
+  const groomParents = groom?.parents || (isEditor ? 'Putra tercinta dari Bpk. ... & Ibu ...' : '');
+  const brideParents = bride?.parents || (isEditor ? 'Putri tercinta dari Bpk. ... & Ibu ...' : '');
 
   return (
     <section
@@ -42,22 +52,23 @@ export const CoupleSideBySide: React.FC<SectionRenderProps<'couple'>> = ({ data 
             color: 'var(--inv-primary, #B86B70)',
           }}
         >
-          {couple.title || 'Mempelai Pengantin'}
+          {copy?.title || 'Mempelai Pengantin'}
         </h2>
-        <p className="text-xs opacity-70">
-          {couple.subtitle || 'Dengan memohon rahmat dan ridho Allah SWT, kami bermaksud mengumumkan pernikahan putra-putri kami:'}
+        <p className="text-xs opacity-70 max-w-sm mx-auto">
+          {copy?.subtitle ||
+            'Dengan memohon rahmat dan ridho Allah SWT, kami bermaksud mengumumkan pernikahan putra-putri kami:'}
         </p>
       </div>
 
-      <div className="space-y-6 max-w-sm mx-auto">
+      <div className="space-y-6 max-w-sm mx-auto w-full">
         {/* Groom Profile */}
         <div className="space-y-2 p-4 rounded-2xl border border-current/10 bg-current/[0.02]">
           <div className="w-20 h-20 mx-auto rounded-full border-2 border-[var(--inv-primary)] overflow-hidden flex items-center justify-center bg-current/[0.05]">
-            {couple.groomPhotoUrl ? (
+            {groom?.photoUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={couple.groomPhotoUrl}
-                alt={couple.groomFullName || 'Mempelai Pria'}
+                src={groom.photoUrl}
+                alt={groomName}
                 className="w-full h-full object-cover"
               />
             ) : (
@@ -68,15 +79,17 @@ export const CoupleSideBySide: React.FC<SectionRenderProps<'couple'>> = ({ data 
             className="text-lg font-medium"
             style={{ fontFamily: 'var(--inv-font-heading, "Playfair Display", serif)' }}
           >
-            {couple.groomFullName || 'Nama Lengkap Pria'}
+            {groomName}
           </h3>
-          <p className="text-xs opacity-80 leading-relaxed">
-            {couple.groomParents || 'Putra dari Bpk. Fulan & Ibu Fulanah'}
-          </p>
-          {couple.groomInstagram && (
+          {groomParents && (
+            <p className="text-xs opacity-80 leading-relaxed">
+              {groomParents}
+            </p>
+          )}
+          {groom?.instagram && (
             <div className="inline-flex items-center gap-1 text-[11px] text-[var(--inv-primary)] font-medium">
               <InstagramIcon className="w-3 h-3" />
-              <span>@{couple.groomInstagram.replace('@', '')}</span>
+              <span>@{groom.instagram.replace('@', '')}</span>
             </div>
           )}
         </div>
@@ -91,11 +104,11 @@ export const CoupleSideBySide: React.FC<SectionRenderProps<'couple'>> = ({ data 
         {/* Bride Profile */}
         <div className="space-y-2 p-4 rounded-2xl border border-current/10 bg-current/[0.02]">
           <div className="w-20 h-20 mx-auto rounded-full border-2 border-[var(--inv-primary)] overflow-hidden flex items-center justify-center bg-current/[0.05]">
-            {couple.bridePhotoUrl ? (
+            {bride?.photoUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={couple.bridePhotoUrl}
-                alt={couple.brideFullName || 'Mempelai Wanita'}
+                src={bride.photoUrl}
+                alt={brideName}
                 className="w-full h-full object-cover"
               />
             ) : (
@@ -106,15 +119,17 @@ export const CoupleSideBySide: React.FC<SectionRenderProps<'couple'>> = ({ data 
             className="text-lg font-medium"
             style={{ fontFamily: 'var(--inv-font-heading, "Playfair Display", serif)' }}
           >
-            {couple.brideFullName || 'Nama Lengkap Wanita'}
+            {brideName}
           </h3>
-          <p className="text-xs opacity-80 leading-relaxed">
-            {couple.brideParents || 'Putri dari Bpk. Fulan & Ibu Fulanah'}
-          </p>
-          {couple.brideInstagram && (
+          {brideParents && (
+            <p className="text-xs opacity-80 leading-relaxed">
+              {brideParents}
+            </p>
+          )}
+          {bride?.instagram && (
             <div className="inline-flex items-center gap-1 text-[11px] text-[var(--inv-primary)] font-medium">
               <InstagramIcon className="w-3 h-3" />
-              <span>@{couple.brideInstagram.replace('@', '')}</span>
+              <span>@{bride.instagram.replace('@', '')}</span>
             </div>
           )}
         </div>

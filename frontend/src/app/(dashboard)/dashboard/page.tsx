@@ -7,12 +7,17 @@ import { Plus, Sparkles, HelpCircle, Trash2, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { invitationsApi, type InvitationData } from '@/services/api/invitations.api';
 import { useDashboardHeaderStore } from '@/lib/stores/dashboard-header.store';
+import { ConfirmDialog } from '@/components/feedback/confirm-dialog';
 import { CreateInvitationDialog } from './components/create-invitation-dialog';
+
+const MAX_DRAFTS = 10;
 
 export default function DashboardPage() {
   const [invitations, setInvitations] = React.useState<InvitationData[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+  const [deleteTarget, setDeleteTarget] = React.useState<{ id: string; title: string } | null>(null);
+  const [isDeleting, setIsDeleting] = React.useState(false);
 
   const setHeader = useDashboardHeaderStore((s) => s.setHeader);
   const resetHeader = useDashboardHeaderStore((s) => s.resetHeader);
@@ -36,22 +41,41 @@ export default function DashboardPage() {
 
   // Daftarkan konfigurasi breadcrumb, title, dan action button ke header store
   React.useEffect(() => {
+    const isLimitReached = invitations.length >= MAX_DRAFTS;
+
     setHeader({
-      title: 'Daftar Undangan Pernikahan',
+      title: 'Undangan Pernikahan Saya',
       breadcrumbs: [
         { label: 'Dashboard', href: '/dashboard' },
         { label: 'Undangan Saya' },
       ],
       showBackButton: false,
       actions: [
+        ...(invitations.length > 0
+          ? [
+              {
+                type: 'button' as const,
+                button: {
+                  id: 'dashboard-limit-badge',
+                  label: `${invitations.length}/${MAX_DRAFTS} Draf (${isLimitReached ? 'Penuh' : 'Tersedia'})`,
+                  variant: 'outline' as const,
+                  disabled: true,
+                  dataTestId: 'dashboard-invitation-limit-badge',
+                },
+              },
+            ]
+          : []),
         {
-          type: 'button',
+          type: 'button' as const,
           button: {
             id: 'dashboard-create-btn',
             label: 'Buat Undangan Baru',
             icon: Plus,
-            variant: 'default',
-            onClick: () => setIsDialogOpen(true),
+            variant: 'default' as const,
+            disabled: isLimitReached,
+            onClick: () => {
+              setIsDialogOpen(true);
+            },
             dataTestId: 'dashboard-create-invitation-btn',
           },
         },
@@ -79,17 +103,20 @@ export default function DashboardPage() {
     return () => {
       resetHeader();
     };
-  }, [setHeader, resetHeader]);
+  }, [setHeader, resetHeader, invitations.length]);
 
-  const handleDelete = async (id: string, title: string) => {
-    if (!window.confirm(`Apakah Anda yakin ingin menghapus undangan "${title}"?`)) return;
-
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    setIsDeleting(true);
     try {
-      await invitationsApi.delete(id);
+      await invitationsApi.delete(deleteTarget.id);
       toast.success('Undangan berhasil dihapus.');
+      setDeleteTarget(null);
       fetchInvitations();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Gagal menghapus undangan.');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -100,6 +127,21 @@ export default function DashboardPage() {
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
         onSuccess={fetchInvitations}
+      />
+
+      {/* Confirmation Dialog Hapus Undangan */}
+      <ConfirmDialog
+        open={!!deleteTarget}
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null);
+        }}
+        title="Hapus Undangan Pernikahan?"
+        description={`Undangan "${deleteTarget?.title || ''}" dan seluruh data di dalamnya akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.`}
+        confirmLabel={isDeleting ? 'Menghapus...' : 'Ya, Hapus'}
+        cancelLabel="Batal"
+        variant="destructive"
+        isLoading={isDeleting}
+        onConfirm={handleConfirmDelete}
       />
 
       {/* Grid Konten Undangan */}
@@ -117,17 +159,17 @@ export default function DashboardPage() {
               Belum Ada Undangan
             </h3>
             <p className="text-xs text-muted-foreground mt-1 max-w-sm mx-auto">
-              Mulai buat undangan pernikahan digital pertama Anda dengan editor interaktif kami.
+              Mulai rancang undangan digital pernikahan impian Anda dengan template elegan dan kemudahan kustomisasi langsung di editor.
             </p>
           </div>
           <Button
             size="sm"
-            onClick={() => setIsDialogOpen(true)}
             data-testid="dashboard-empty-create-btn"
+            onClick={() => setIsDialogOpen(true)}
             className="gap-1.5"
           >
             <Plus className="w-4 h-4" />
-            <span>Buat Undangan Sekarang</span>
+            <span>Mulai Buat Undangan</span>
           </Button>
         </div>
       ) : (
@@ -143,7 +185,7 @@ export default function DashboardPage() {
                   <span
                     className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${
                       inv.isPublished
-                        ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 border border-emerald-200/50'
+                        ? 'bg-success text-success-foreground border border-success-foreground/20'
                         : 'bg-muted text-muted-foreground border border-border'
                     }`}
                   >
@@ -176,7 +218,7 @@ export default function DashboardPage() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => handleDelete(inv.id, inv.title)}
+                  onClick={() => setDeleteTarget({ id: inv.id, title: inv.title })}
                   className="px-2 text-muted-foreground hover:text-destructive transition-colors"
                   title="Hapus Undangan"
                 >

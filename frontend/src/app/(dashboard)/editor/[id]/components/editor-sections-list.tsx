@@ -23,6 +23,18 @@ import { cn } from '@/lib/utils';
 import { useInvitationEditorStore } from '@/lib/stores/invitation-editor.store';
 import type { SectionNode } from '@/modules/invitation-sections/types';
 
+const SECTION_TYPE_LABELS: Record<string, string> = {
+  hero: 'Cover Utama (Hero)',
+  quote: 'Kutipan & Ayat Suci',
+  couple: 'Profil Mempelai',
+  event: 'Jadwal Acara',
+  gallery: 'Galeri Foto',
+  story: 'Kisah Cinta',
+  rsvp: 'Konfirmasi RSVP',
+  gift: 'Kado & Angpao Digital',
+  footer: 'Penutup & Doa',
+};
+
 interface SortableItemProps {
   section: SectionNode;
   isActive: boolean;
@@ -53,6 +65,8 @@ const SortableSectionItem: React.FC<SortableItemProps> = ({
     zIndex: isDragging ? 50 : undefined,
   };
 
+  const label = SECTION_TYPE_LABELS[section.type] || section.type;
+
   return (
     <div
       ref={setNodeRef}
@@ -80,11 +94,11 @@ const SortableSectionItem: React.FC<SortableItemProps> = ({
         </button>
 
         <div className="truncate">
-          <p className="truncate font-semibold capitalize">
-            {section.data?.title || section.type}
+          <p className="truncate font-semibold">
+            {label}
           </p>
           <p className="text-[10px] text-muted-foreground uppercase font-mono">
-            {section.type} • {section.variant}
+            Varian: {section.variant}
           </p>
         </div>
       </div>
@@ -123,6 +137,12 @@ export const EditorSectionsList: React.FC<EditorSectionsListProps> = ({ onOpenAd
   const reorderSections = useInvitationEditorStore((s) => s.reorderSections);
   const toggleSectionVisibility = useInvitationEditorStore((s) => s.toggleSectionVisibility);
   const deleteSection = useInvitationEditorStore((s) => s.deleteSection);
+  const setActiveTab = useInvitationEditorStore((s) => s.setActiveTab);
+
+  const handleSelectSection = (id: string) => {
+    setActiveSection(id);
+    setActiveTab('inspector');
+  };
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -185,7 +205,7 @@ export const EditorSectionsList: React.FC<EditorSectionsListProps> = ({ onOpenAd
                 key={sec.id}
                 section={sec}
                 isActive={sec.id === activeSectionId}
-                onSelect={setActiveSection}
+                onSelect={handleSelectSection}
                 onToggleVisibility={toggleSectionVisibility}
                 onDelete={deleteSection}
               />

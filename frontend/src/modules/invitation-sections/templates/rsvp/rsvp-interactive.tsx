@@ -1,12 +1,14 @@
 'use client';
 
 import * as React from 'react';
-import type { SectionRenderProps, RsvpSectionData } from '../../types';
+import type { SectionRenderProps } from '../../types';
 import { Send, CheckCircle2, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-export const RsvpInteractive: React.FC<SectionRenderProps<'rsvp'>> = ({ data, isEditor }) => {
-  const rsvp = data as RsvpSectionData;
+export const RsvpInteractive: React.FC<SectionRenderProps<'rsvp'>> = ({
+  copy,
+  isEditor,
+}) => {
   const [name, setName] = React.useState('');
   const [presence, setPresence] = React.useState<'attending' | 'not_attending'>('attending');
   const [message, setMessage] = React.useState('');
@@ -21,7 +23,7 @@ export const RsvpInteractive: React.FC<SectionRenderProps<'rsvp'>> = ({ data, is
   return (
     <section
       data-testid="section-rsvp-interactive"
-      className="relative w-full py-16 px-6 text-center space-y-6 flex flex-col justify-center items-center min-h-[100dvh] min-h-screen"
+      className="relative w-full py-16 px-6 text-center space-y-6 flex flex-col justify-center items-center min-h-[60vh]"
       style={{
         backgroundColor: 'var(--inv-bg, #FAF8F5)',
         color: 'var(--inv-font-body, #3A302C)',
@@ -35,14 +37,15 @@ export const RsvpInteractive: React.FC<SectionRenderProps<'rsvp'>> = ({ data, is
             color: 'var(--inv-primary, #B86B70)',
           }}
         >
-          {rsvp.title || 'Konfirmasi Kehadiran & Doa Restu'}
+          {copy?.title || 'Konfirmasi Kehadiran & Doa Restu'}
         </h2>
-        <p className="text-xs opacity-70">
-          {rsvp.subtitle || 'Kirimkan ucapan dan konfirmasi kehadiran Anda untuk menyempurnakan hari bahagia kami'}
+        <p className="text-xs opacity-70 max-w-sm mx-auto">
+          {copy?.subtitle ||
+            'Kirimkan ucapan dan konfirmasi kehadiran Anda untuk menyempurnakan hari bahagia kami'}
         </p>
       </div>
 
-      <div className="max-w-sm mx-auto text-left">
+      <div className="max-w-sm mx-auto text-left w-full">
         {isSubmitted && !isEditor ? (
           <div className="p-6 rounded-2xl border border-current/15 bg-current/[0.03] text-center space-y-2">
             <CheckCircle2 className="w-8 h-8 mx-auto text-[var(--inv-primary)]" />

@@ -1,30 +1,33 @@
 'use client';
 
 import * as React from 'react';
-import type { SectionRenderProps, GiftSectionData } from '../../types';
+import type { SectionRenderProps, BankAccountItem } from '../../types';
 import { Gift, Copy, Check } from 'lucide-react';
 import { toast } from 'sonner';
 
-export const GiftBankCards: React.FC<SectionRenderProps<'gift'>> = ({ data }) => {
-  const gift = data as GiftSectionData;
+export const GiftBankCards: React.FC<SectionRenderProps<'gift'>> = ({
+  content,
+  copy,
+  isEditor,
+}) => {
   const [copiedId, setCopiedId] = React.useState<string | null>(null);
 
-  const accounts = gift.accounts && gift.accounts.length > 0
-    ? gift.accounts
-    : [
-        {
-          id: '1',
-          bankName: 'Bank Central Asia (BCA)',
-          accountNumber: '1234567890',
-          accountHolder: 'Romeo Montague',
-        },
-        {
-          id: '2',
-          bankName: 'Bank Mandiri',
-          accountNumber: '9876543210',
-          accountHolder: 'Juliet Capulet',
-        },
-      ];
+  const accounts = (content?.gift?.accounts && content.gift.accounts.length > 0)
+    ? content.gift.accounts
+    : (isEditor
+        ? [
+            {
+              id: 'sample-bank-1',
+              bankName: 'Bank Central Asia (BCA)',
+              accountNumber: '1234567890',
+              accountHolder: 'Nama Pemilik Rekening',
+            },
+          ]
+        : []);
+
+  const giftAddress = content?.gift?.giftAddress;
+  const recipientName = content?.gift?.recipientName;
+  const recipientPhone = content?.gift?.recipientPhone;
 
   const handleCopy = (accId: string, accNum: string) => {
     navigator.clipboard.writeText(accNum);
@@ -36,7 +39,7 @@ export const GiftBankCards: React.FC<SectionRenderProps<'gift'>> = ({ data }) =>
   return (
     <section
       data-testid="section-gift-bank-cards"
-      className="relative w-full py-16 px-6 text-center space-y-6 flex flex-col justify-center items-center min-h-[100dvh] min-h-screen"
+      className="relative w-full py-16 px-6 text-center space-y-6 flex flex-col justify-center items-center min-h-[60vh]"
       style={{
         backgroundColor: 'var(--inv-bg, #FAF8F5)',
         color: 'var(--inv-font-body, #3A302C)',
@@ -50,15 +53,16 @@ export const GiftBankCards: React.FC<SectionRenderProps<'gift'>> = ({ data }) =>
             color: 'var(--inv-primary, #B86B70)',
           }}
         >
-          {gift.title || 'Tanda Kasih (Wedding Gift)'}
+          {copy?.title || 'Tanda Kasih (Wedding Gift)'}
         </h2>
         <p className="text-xs opacity-70 max-w-xs mx-auto">
-          {gift.subtitle || 'Doa restu Anda merupakan karunia terindah bagi kami. Namun jika berkenan memberikan tanda kasih, dapat disalurkan melalui rekening berikut:'}
+          {copy?.subtitle ||
+            'Doa restu Anda merupakan karunia terindah bagi kami. Namun jika berkenan memberikan tanda kasih, dapat disalurkan melalui rekening berikut:'}
         </p>
       </div>
 
-      <div className="space-y-3.5 max-w-sm mx-auto">
-        {accounts.map((acc) => (
+      <div className="space-y-3.5 max-w-sm mx-auto w-full">
+        {accounts.map((acc: BankAccountItem) => (
           <div
             key={acc.id}
             className="p-4 rounded-2xl border border-current/10 bg-current/[0.02] text-left space-y-2 relative"
@@ -74,8 +78,8 @@ export const GiftBankCards: React.FC<SectionRenderProps<'gift'>> = ({ data }) =>
               >
                 {copiedId === acc.id ? (
                   <>
-                    <Check className="w-3 h-3 text-emerald-600" />
-                    <span className="text-emerald-600">Tersalin</span>
+                    <Check className="w-3 h-3 text-success-foreground" />
+                    <span className="text-success-foreground font-semibold">Tersalin</span>
                   </>
                 ) : (
                   <>
@@ -95,15 +99,17 @@ export const GiftBankCards: React.FC<SectionRenderProps<'gift'>> = ({ data }) =>
           </div>
         ))}
 
-        {gift.giftAddress && (
+        {giftAddress && (
           <div className="p-4 rounded-2xl border border-dashed border-current/20 text-left space-y-1">
             <div className="flex items-center gap-1.5 text-xs font-semibold text-[var(--inv-primary)]">
               <Gift className="w-3.5 h-3.5" />
               <span>Kirim Kado Fisik</span>
             </div>
-            <p className="text-xs opacity-80 leading-relaxed">{gift.giftAddress}</p>
-            {gift.recipientName && (
-              <p className="text-[11px] opacity-70">Penerima: {gift.recipientName} ({gift.recipientPhone || '-'})</p>
+            <p className="text-xs opacity-80 leading-relaxed">{giftAddress}</p>
+            {recipientName && (
+              <p className="text-[11px] opacity-70">
+                Penerima: {recipientName} ({recipientPhone || '-'})
+              </p>
             )}
           </div>
         )}

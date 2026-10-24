@@ -1,23 +1,31 @@
 'use client';
 
 import * as React from 'react';
-import { ChevronLeft, Sliders, Type, Trash2 } from 'lucide-react';
+import { ChevronLeft, Sliders, Trash2, Layout, ArrowRight, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useInvitationEditorStore } from '@/lib/stores/invitation-editor.store';
-import type {
-  HeroSectionData,
-  QuoteSectionData,
-  CoupleSectionData,
-  EventSectionData,
-  GiftSectionData,
-  FooterSectionData,
-} from '@/modules/invitation-sections/types';
+import type { SectionType } from '@/modules/invitation-sections/types';
+
+const SECTION_VARIANT_OPTIONS: Partial<
+  Record<SectionType, { label: string; value: string; description: string }[]>
+> = {
+  gallery: [
+    { label: 'Grid 2 Kolom', value: 'grid', description: 'Tampilan grid foto rapi' },
+    { label: 'Slider Carousel', value: 'slider', description: 'Geser horizontal dengan navigasi' },
+    { label: 'Cards Bertingkat', value: 'cards', description: 'Kartu editorial berbingkai' },
+  ],
+  event: [
+    { label: 'Kartu Agenda', value: 'cards', description: 'Kartu terpisah per acara' },
+    { label: 'Garis Waktu', value: 'timeline', description: 'Tampilan kronologis waktu' },
+  ],
+};
 
 export const EditorSectionInspector: React.FC = () => {
   const sections = useInvitationEditorStore((s) => s.sections);
   const activeSectionId = useInvitationEditorStore((s) => s.activeSectionId);
   const setActiveTab = useInvitationEditorStore((s) => s.setActiveTab);
-  const updateSectionData = useInvitationEditorStore((s) => s.updateSectionData);
+  const updateSectionCopy = useInvitationEditorStore((s) => s.updateSectionCopy);
+  const updateSectionVariant = useInvitationEditorStore((s) => s.updateSectionVariant);
   const deleteSection = useInvitationEditorStore((s) => s.deleteSection);
 
   const activeSection = sections.find((s) => s.id === activeSectionId);
@@ -26,7 +34,7 @@ export const EditorSectionInspector: React.FC = () => {
     return (
       <div className="p-8 text-center text-xs text-muted-foreground space-y-3">
         <Sliders className="w-8 h-8 mx-auto opacity-40" />
-        <p>Pilih salah satu bagian dari daftar seksi atau langsung klik pada kanvas untuk mengedit konten.</p>
+        <p>Pilih salah satu bagian dari susunan halaman atau klik langsung pada kanvas untuk mengatur gaya.</p>
         <Button
           type="button"
           variant="outline"
@@ -34,18 +42,21 @@ export const EditorSectionInspector: React.FC = () => {
           onClick={() => setActiveTab('sections')}
           className="text-xs"
         >
-          Lihat Daftar Bagian
+          Lihat Susunan Bagian
         </Button>
       </div>
     );
   }
 
-  const handleTextChange = (field: string, value: unknown) => {
-    updateSectionData(activeSection.id, { [field]: value });
+  const copy = (activeSection.copy || {}) as Record<string, unknown>;
+  const availableVariants = SECTION_VARIANT_OPTIONS[activeSection.type];
+
+  const handleCopyChange = (field: string, value: string) => {
+    updateSectionCopy(activeSection.id, { [field]: value });
   };
 
   return (
-    <div className="space-y-5" data-testid="editor-section-inspector">
+    <div className="space-y-5 text-xs" data-testid="editor-section-inspector">
       {/* Header Inspector */}
       <div className="flex items-center justify-between border-b border-border pb-3">
         <button
@@ -54,7 +65,7 @@ export const EditorSectionInspector: React.FC = () => {
           className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
         >
           <ChevronLeft className="w-3.5 h-3.5" />
-          <span>Kembali ke Struktur</span>
+          <span>Kembali ke Susunan</span>
         </button>
 
         <button
@@ -68,391 +79,142 @@ export const EditorSectionInspector: React.FC = () => {
         </button>
       </div>
 
-      <div className="space-y-1">
-        <div className="flex items-center gap-1.5 text-xs font-semibold text-primary uppercase font-mono">
-          <Type className="w-3.5 h-3.5" />
-          <span>Bagian: {activeSection.type}</span>
+      {/* Info Banner: Data Single Source of Truth */}
+      <div className="p-3 rounded-xl border border-primary/20 bg-primary/5 flex items-start gap-2.5">
+        <FileText className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+        <div className="space-y-1">
+          <p className="font-semibold text-foreground text-[11px]">
+            Data Inti Dikelola di Tab &ldquo;Isi Data&rdquo;
+          </p>
+          <p className="text-[10px] text-muted-foreground leading-relaxed">
+            Nama mempelai, jadwal acara, foto, dan nomor rekening terhubung secara otomatis di seluruh bagian.
+          </p>
+          <button
+            type="button"
+            onClick={() => setActiveTab('content')}
+            className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary hover:underline pt-0.5"
+          >
+            <span>Buka Form Isi Data</span>
+            <ArrowRight className="w-3 h-3" />
+          </button>
         </div>
-        <h4 className="text-sm font-semibold text-foreground">
-          Pengaturan Konten & Teks
-        </h4>
       </div>
 
-      {/* Dynamic Form per Section Type */}
-      <div className="space-y-4 text-xs">
-        {/* Title & Subtitle Universal Fields */}
+      {/* Pilihan Varian Tata Letak jika tersedia */}
+      {availableVariants && availableVariants.length > 0 && (
+        <div className="space-y-2">
+          <label className="font-semibold text-foreground flex items-center gap-1.5">
+            <Layout className="w-3.5 h-3.5 text-primary" />
+            <span>Pilihan Varian Tampilan</span>
+          </label>
+          <div className="grid grid-cols-1 gap-1.5">
+            {availableVariants.map((opt) => {
+              const isSelected = (activeSection.variant || 'default') === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  data-testid={`inspector-variant-${opt.value}`}
+                  onClick={() => updateSectionVariant(activeSection.id, opt.value)}
+                  className={`p-2.5 rounded-lg border text-left transition-all ${
+                    isSelected
+                      ? 'border-primary ring-1 ring-primary bg-primary/5 font-medium text-foreground'
+                      : 'border-border bg-card/60 hover:border-primary/40 text-muted-foreground'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-xs">{opt.label}</span>
+                    {isSelected && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary font-bold">
+                        Aktif
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">{opt.description}</p>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Kustomisasi Teks Kontekstual Bagian (Copy) */}
+      <div className="space-y-3 pt-2 border-t border-border">
+        <label className="font-semibold text-foreground block">
+          Penyesuaian Judul & Pesan Bagian
+        </label>
+
+        {activeSection.type !== 'hero' && (
+          <div>
+            <label className="block text-[11px] font-medium mb-1 text-muted-foreground">
+              Judul Seksi
+            </label>
+            <input
+              type="text"
+              value={(copy.title as string) || ''}
+              onChange={(e) => handleCopyChange('title', e.target.value)}
+              placeholder="Judul Bagian"
+              className="w-full rounded-md border border-input bg-background px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-ring"
+            />
+          </div>
+        )}
+
         <div>
-          <label className="block font-medium mb-1 text-foreground">Judul Bagian</label>
+          <label className="block text-[11px] font-medium mb-1 text-muted-foreground">
+            Subjudul / Keterangan Pembuka
+          </label>
           <input
             type="text"
-            value={(activeSection.data?.title as string) || ''}
-            onChange={(e) => handleTextChange('title', e.target.value)}
-            placeholder="Judul Section"
+            value={(copy.subtitle as string) || ''}
+            onChange={(e) => handleCopyChange('subtitle', e.target.value)}
+            placeholder="Subjudul Bagian"
             className="w-full rounded-md border border-input bg-background px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-ring"
           />
         </div>
 
-        {/* Hero Specific */}
-        {activeSection.type === 'hero' && (() => {
-          const hero = activeSection.data as HeroSectionData;
-          return (
-            <>
-              <div>
-                <label className="block font-medium mb-1 text-foreground">Nama Mempelai Pria</label>
-                <input
-                  type="text"
-                  value={hero.groomName || ''}
-                  onChange={(e) => handleTextChange('groomName', e.target.value)}
-                  placeholder="Romeo"
-                  className="w-full rounded-md border border-input bg-background px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-ring"
-                />
-              </div>
-              <div>
-                <label className="block font-medium mb-1 text-foreground">Nama Mempelai Wanita</label>
-                <input
-                  type="text"
-                  value={hero.brideName || ''}
-                  onChange={(e) => handleTextChange('brideName', e.target.value)}
-                  placeholder="Juliet"
-                  className="w-full rounded-md border border-input bg-background px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-ring"
-                />
-              </div>
-              <div>
-                <label className="block font-medium mb-1 text-foreground">Tanggal Acara</label>
-                <input
-                  type="text"
-                  value={hero.weddingDate || ''}
-                  onChange={(e) => handleTextChange('weddingDate', e.target.value)}
-                  placeholder="Sabtu, 28 Oktober 2026"
-                  className="w-full rounded-md border border-input bg-background px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-ring"
-                />
-              </div>
-              <div>
-                <label className="block font-medium mb-1 text-foreground">Pesan Pembuka</label>
-                <textarea
-                  rows={3}
-                  value={hero.welcomeNote || ''}
-                  onChange={(e) => handleTextChange('welcomeNote', e.target.value)}
-                  className="w-full rounded-md border border-input bg-background px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-ring resize-none"
-                />
-              </div>
-            </>
-          );
-        })()}
+        {activeSection.type === 'hero' && (
+          <div>
+            <label className="block text-[11px] font-medium mb-1 text-muted-foreground">
+              Pesan Sambutan (Welcome Note)
+            </label>
+            <textarea
+              rows={3}
+              value={(copy.welcomeNote as string) || ''}
+              onChange={(e) => handleCopyChange('welcomeNote', e.target.value)}
+              placeholder="Dengan penuh rasa syukur..."
+              className="w-full rounded-md border border-input bg-background px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-ring resize-none"
+            />
+          </div>
+        )}
 
-        {/* Quote Specific */}
-        {activeSection.type === 'quote' && (() => {
-          const q = activeSection.data as QuoteSectionData;
-          return (
-            <>
-              <div>
-                <label className="block font-medium mb-1 text-foreground">Teks Ayat / Kutipan</label>
-                <textarea
-                  rows={4}
-                  value={q.quoteText || ''}
-                  onChange={(e) => handleTextChange('quoteText', e.target.value)}
-                  className="w-full rounded-md border border-input bg-background px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-ring resize-none"
-                />
-              </div>
-              <div>
-                <label className="block font-medium mb-1 text-foreground">Sumber Kutipan (cth: QS. Ar-Rum: 21)</label>
-                <input
-                  type="text"
-                  value={q.sourceText || ''}
-                  onChange={(e) => handleTextChange('sourceText', e.target.value)}
-                  className="w-full rounded-md border border-input bg-background px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-ring"
-                />
-              </div>
-            </>
-          );
-        })()}
-
-        {/* Couple Specific */}
-        {activeSection.type === 'couple' && (() => {
-          const couple = activeSection.data as CoupleSectionData;
-          return (
-            <div className="space-y-4">
-              <div className="p-3 rounded-lg border border-border bg-card-oat/40 space-y-2">
-                <p className="font-semibold text-primary">Data Mempelai Pria</p>
-                <div>
-                  <label className="block text-[11px] mb-1">Nama Lengkap & Gelar</label>
-                  <input
-                    type="text"
-                    value={couple.groomFullName || ''}
-                    onChange={(e) => handleTextChange('groomFullName', e.target.value)}
-                    className="w-full rounded-md border border-input bg-background px-2.5 py-1 text-xs"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[11px] mb-1">Nama Orang Tua</label>
-                  <input
-                    type="text"
-                    value={couple.groomParents || ''}
-                    onChange={(e) => handleTextChange('groomParents', e.target.value)}
-                    className="w-full rounded-md border border-input bg-background px-2.5 py-1 text-xs"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[11px] mb-1">Username Instagram</label>
-                  <input
-                    type="text"
-                    value={couple.groomInstagram || ''}
-                    onChange={(e) => handleTextChange('groomInstagram', e.target.value)}
-                    placeholder="romeomontague"
-                    className="w-full rounded-md border border-input bg-background px-2.5 py-1 text-xs font-mono"
-                  />
-                </div>
-              </div>
-
-              <div className="p-3 rounded-lg border border-border bg-card-oat/40 space-y-2">
-                <p className="font-semibold text-primary">Data Mempelai Wanita</p>
-                <div>
-                  <label className="block text-[11px] mb-1">Nama Lengkap & Gelar</label>
-                  <input
-                    type="text"
-                    value={couple.brideFullName || ''}
-                    onChange={(e) => handleTextChange('brideFullName', e.target.value)}
-                    className="w-full rounded-md border border-input bg-background px-2.5 py-1 text-xs"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[11px] mb-1">Nama Orang Tua</label>
-                  <input
-                    type="text"
-                    value={couple.brideParents || ''}
-                    onChange={(e) => handleTextChange('brideParents', e.target.value)}
-                    className="w-full rounded-md border border-input bg-background px-2.5 py-1 text-xs"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[11px] mb-1">Username Instagram</label>
-                  <input
-                    type="text"
-                    value={couple.brideInstagram || ''}
-                    onChange={(e) => handleTextChange('brideInstagram', e.target.value)}
-                    placeholder="julietcapulet"
-                    className="w-full rounded-md border border-input bg-background px-2.5 py-1 text-xs font-mono"
-                  />
-                </div>
-              </div>
+        {activeSection.type === 'footer' && (
+          <>
+            <div>
+              <label className="block text-[11px] font-medium mb-1 text-muted-foreground">
+                Teks Penutup
+              </label>
+              <input
+                type="text"
+                value={(copy.closingText as string) || ''}
+                onChange={(e) => handleCopyChange('closingText', e.target.value)}
+                placeholder="Terima Kasih"
+                className="w-full rounded-md border border-input bg-background px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-ring"
+              />
             </div>
-          );
-        })()}
-
-        {/* Story / Love Story Specific */}
-        {activeSection.type === 'story' && (() => {
-          const st = activeSection.data as { stories?: Array<{ id: string; year: string; title: string; story: string }> };
-          const stories = st.stories || [];
-          return (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="font-semibold text-foreground">Daftar Momen Cerita</span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const next = [
-                      ...stories,
-                      {
-                        id: `st-${Date.now()}`,
-                        year: '2026',
-                        title: 'Momen Baru',
-                        story: 'Ceritakan kisah indah perjalanan cinta Anda...',
-                      },
-                    ];
-                    handleTextChange('stories', next);
-                  }}
-                  className="text-[11px] font-semibold text-primary hover:underline"
-                >
-                  + Tambah Momen
-                </button>
-              </div>
-
-              {stories.map((item, idx) => (
-                <div key={item.id || idx} className="p-3 rounded-lg border border-border space-y-2 bg-card-oat/20">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-semibold uppercase text-primary">Momen #{idx + 1}</span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const next = stories.filter((_, i) => i !== idx);
-                        handleTextChange('stories', next);
-                      }}
-                      className="text-[10px] text-muted-foreground hover:text-destructive"
-                    >
-                      Hapus
-                    </button>
-                  </div>
-                  <div>
-                    <label className="block text-[10px] text-muted-foreground">Tahun</label>
-                    <input
-                      type="text"
-                      value={item.year}
-                      onChange={(e) => {
-                        const next = [...stories];
-                        next[idx] = { ...next[idx], year: e.target.value };
-                        handleTextChange('stories', next);
-                      }}
-                      className="w-full rounded border px-2 py-1 text-xs bg-background font-mono"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] text-muted-foreground">Judul Momen</label>
-                    <input
-                      type="text"
-                      value={item.title}
-                      onChange={(e) => {
-                        const next = [...stories];
-                        next[idx] = { ...next[idx], title: e.target.value };
-                        handleTextChange('stories', next);
-                      }}
-                      className="w-full rounded border px-2 py-1 text-xs bg-background"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] text-muted-foreground">Kisah Singkat</label>
-                    <textarea
-                      rows={2}
-                      value={item.story}
-                      onChange={(e) => {
-                        const next = [...stories];
-                        next[idx] = { ...next[idx], story: e.target.value };
-                        handleTextChange('stories', next);
-                      }}
-                      className="w-full rounded border px-2 py-1 text-xs bg-background resize-none"
-                    />
-                  </div>
-                </div>
-              ))}
+            <div>
+              <label className="block text-[11px] font-medium mb-1 text-muted-foreground">
+                Catatan Terima Kasih
+              </label>
+              <textarea
+                rows={3}
+                value={(copy.thankYouNote as string) || ''}
+                onChange={(e) => handleCopyChange('thankYouNote', e.target.value)}
+                placeholder="Merupakan suatu kehormatan..."
+                className="w-full rounded-md border border-input bg-background px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-ring resize-none"
+              />
             </div>
-          );
-        })()}
-        {activeSection.type === 'event' && (() => {
-          const ev = activeSection.data as EventSectionData;
-          return (
-            <div className="space-y-3">
-              <p className="text-muted-foreground text-[11px]">
-                Agenda acara seperti Akad dan Resepsi dapat dikonfigurasi melalui data jadwal berikut:
-              </p>
-              {ev.events?.map((item, idx) => (
-                <div key={item.id || idx} className="p-3 rounded-lg border border-border space-y-2 bg-card-oat/20">
-                  <div className="font-semibold text-foreground">{item.eventName}</div>
-                  <div>
-                    <label className="block text-[10px] text-muted-foreground">Waktu & Tanggal</label>
-                    <input
-                      type="text"
-                      value={item.timeRange}
-                      onChange={(e) => {
-                        const next = [...(ev.events || [])];
-                        next[idx] = { ...next[idx], timeRange: e.target.value };
-                        handleTextChange('events', next);
-                      }}
-                      className="w-full rounded border px-2 py-1 text-xs bg-background"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] text-muted-foreground">Tempat / Lokasi</label>
-                    <input
-                      type="text"
-                      value={item.venueName}
-                      onChange={(e) => {
-                        const next = [...(ev.events || [])];
-                        next[idx] = { ...next[idx], venueName: e.target.value };
-                        handleTextChange('events', next);
-                      }}
-                      className="w-full rounded border px-2 py-1 text-xs bg-background"
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          );
-        })()}
-
-        {/* Gift Specific */}
-        {activeSection.type === 'gift' && (() => {
-          const gift = activeSection.data as GiftSectionData;
-          return (
-            <div className="space-y-3">
-              <div>
-                <label className="block font-medium mb-1 text-foreground">Alamat Kirim Kado Fisik</label>
-                <textarea
-                  rows={2}
-                  value={gift.giftAddress || ''}
-                  onChange={(e) => handleTextChange('giftAddress', e.target.value)}
-                  placeholder="Alamat lengkap penerima..."
-                  className="w-full rounded-md border border-input bg-background px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-ring resize-none"
-                />
-              </div>
-              <div className="space-y-2">
-                <p className="font-semibold text-foreground">Rekening Transfer</p>
-                {gift.accounts?.map((acc, idx) => (
-                  <div key={acc.id || idx} className="p-2.5 rounded-lg border border-border bg-card-oat/30 space-y-1.5">
-                    <input
-                      type="text"
-                      value={acc.bankName}
-                      placeholder="Nama Bank (BCA / Mandiri)"
-                      onChange={(e) => {
-                        const next = [...(gift.accounts || [])];
-                        next[idx] = { ...next[idx], bankName: e.target.value };
-                        handleTextChange('accounts', next);
-                      }}
-                      className="w-full rounded border px-2 py-1 text-xs bg-background"
-                    />
-                    <input
-                      type="text"
-                      value={acc.accountNumber}
-                      placeholder="Nomor Rekening"
-                      onChange={(e) => {
-                        const next = [...(gift.accounts || [])];
-                        next[idx] = { ...next[idx], accountNumber: e.target.value };
-                        handleTextChange('accounts', next);
-                      }}
-                      className="w-full rounded border px-2 py-1 text-xs bg-background font-mono"
-                    />
-                    <input
-                      type="text"
-                      value={acc.accountHolder}
-                      placeholder="Atas Nama (Pemilik Rekening)"
-                      onChange={(e) => {
-                        const next = [...(gift.accounts || [])];
-                        next[idx] = { ...next[idx], accountHolder: e.target.value };
-                        handleTextChange('accounts', next);
-                      }}
-                      className="w-full rounded border px-2 py-1 text-xs bg-background"
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          );
-        })()}
-
-        {/* Footer Specific */}
-        {activeSection.type === 'footer' && (() => {
-          const ft = activeSection.data as FooterSectionData;
-          return (
-            <>
-              <div>
-                <label className="block font-medium mb-1 text-foreground">Teks Penutup</label>
-                <input
-                  type="text"
-                  value={ft.closingText || ''}
-                  onChange={(e) => handleTextChange('closingText', e.target.value)}
-                  className="w-full rounded-md border border-input bg-background px-3 py-1.5 text-xs"
-                />
-              </div>
-              <div>
-                <label className="block font-medium mb-1 text-foreground">Ucapan Terima Kasih</label>
-                <textarea
-                  rows={3}
-                  value={ft.thankYouNote || ''}
-                  onChange={(e) => handleTextChange('thankYouNote', e.target.value)}
-                  className="w-full rounded-md border border-input bg-background px-3 py-1.5 text-xs resize-none"
-                />
-              </div>
-            </>
-          );
-        })()}
+          </>
+        )}
       </div>
     </div>
   );

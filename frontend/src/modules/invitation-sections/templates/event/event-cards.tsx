@@ -1,38 +1,35 @@
 'use client';
 
 import * as React from 'react';
-import type { SectionRenderProps, EventSectionData } from '../../types';
+import type { SectionRenderProps, EventItem } from '../../types';
 import { Calendar, Clock, MapPin, ExternalLink } from 'lucide-react';
+import { formatDateIndonesian } from '../../content-format.utils';
 
-export const EventCards: React.FC<SectionRenderProps<'event'>> = ({ data }) => {
-  const event = data as EventSectionData;
-  const events = event.events && event.events.length > 0
-    ? event.events
-    : [
-        {
-          id: '1',
-          eventName: 'Akad Nikah',
-          date: 'Sabtu, 28 Oktober 2026',
-          timeRange: '08:00 - 10:00 WIB',
-          venueName: 'Masjid Agung Al-Azhar',
-          venueAddress: 'Jl. Sisingamangaraja, Kebayoran Baru, Jakarta Selatan',
-          mapsUrl: 'https://maps.google.com',
-        },
-        {
-          id: '2',
-          eventName: 'Resepsi Pernikahan',
-          date: 'Sabtu, 28 Oktober 2026',
-          timeRange: '11:00 - 14:00 WIB',
-          venueName: 'Grand Ballroom Hotel Mulia',
-          venueAddress: 'Jl. Asia Afrika, Senayan, Jakarta Pusat',
-          mapsUrl: 'https://maps.google.com',
-        },
-      ];
+export const EventCards: React.FC<SectionRenderProps<'event'>> = ({
+  content,
+  copy,
+  isEditor,
+}) => {
+  const events = (content?.events && content.events.length > 0)
+    ? content.events
+    : (isEditor
+        ? [
+            {
+              id: 'sample-1',
+              eventName: 'Akad Nikah',
+              date: '2026-10-28',
+              timeRange: '08:00 - 10:00 WIB',
+              venueName: 'Nama Tempat / Gedung',
+              venueAddress: 'Alamat lengkap tempat pelaksanaan acara',
+              mapsUrl: '',
+            },
+          ]
+        : []);
 
   return (
     <section
       data-testid="section-event-cards"
-      className="relative w-full py-16 px-6 text-center space-y-6 flex flex-col justify-center items-center min-h-[100dvh] min-h-screen"
+      className="relative w-full py-16 px-6 text-center space-y-6 flex flex-col justify-center items-center min-h-[60vh]"
       style={{
         backgroundColor: 'var(--inv-bg, #FAF8F5)',
         color: 'var(--inv-font-body, #3A302C)',
@@ -46,15 +43,15 @@ export const EventCards: React.FC<SectionRenderProps<'event'>> = ({ data }) => {
             color: 'var(--inv-primary, #B86B70)',
           }}
         >
-          {event.title || 'Agenda Acara'}
+          {copy?.title || 'Agenda Acara'}
         </h2>
-        <p className="text-xs opacity-70">
-          {event.subtitle || 'Rangkaian momen bahagia pernikahan kami'}
+        <p className="text-xs opacity-70 max-w-sm mx-auto">
+          {copy?.subtitle || 'Rangkaian momen bahagia pernikahan kami'}
         </p>
       </div>
 
-      <div className="space-y-4 max-w-sm mx-auto">
-        {events.map((item) => (
+      <div className="space-y-4 max-w-sm mx-auto w-full">
+        {events.map((item: EventItem) => (
           <div
             key={item.id}
             className="p-5 rounded-2xl border border-current/10 bg-current/[0.02] space-y-3 text-left"
@@ -64,26 +61,36 @@ export const EventCards: React.FC<SectionRenderProps<'event'>> = ({ data }) => {
                 className="text-base font-semibold text-[var(--inv-primary)]"
                 style={{ fontFamily: 'var(--inv-font-heading, "Playfair Display", serif)' }}
               >
-                {item.eventName}
+                {item.eventName || 'Nama Acara'}
               </h3>
             </div>
 
             <div className="space-y-1.5 text-xs">
-              <div className="flex items-center gap-2 opacity-80">
-                <Calendar className="w-3.5 h-3.5 text-[var(--inv-primary)] shrink-0" />
-                <span>{item.date}</span>
-              </div>
-              <div className="flex items-center gap-2 opacity-80">
-                <Clock className="w-3.5 h-3.5 text-[var(--inv-primary)] shrink-0" />
-                <span>{item.timeRange}</span>
-              </div>
-              <div className="flex items-start gap-2 opacity-80 pt-1">
-                <MapPin className="w-3.5 h-3.5 text-[var(--inv-primary)] shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-medium text-foreground">{item.venueName}</p>
-                  <p className="opacity-70 text-[11px] leading-relaxed">{item.venueAddress}</p>
+              {item.date && (
+                <div className="flex items-center gap-2 opacity-80">
+                  <Calendar className="w-3.5 h-3.5 text-[var(--inv-primary)] shrink-0" />
+                  <span>{formatDateIndonesian(item.date)}</span>
                 </div>
-              </div>
+              )}
+              {item.timeRange && (
+                <div className="flex items-center gap-2 opacity-80">
+                  <Clock className="w-3.5 h-3.5 text-[var(--inv-primary)] shrink-0" />
+                  <span>{item.timeRange}</span>
+                </div>
+              )}
+              {(item.venueName || item.venueAddress) && (
+                <div className="flex items-start gap-2 opacity-80 pt-1">
+                  <MapPin className="w-3.5 h-3.5 text-[var(--inv-primary)] shrink-0 mt-0.5" />
+                  <div>
+                    {item.venueName && (
+                      <p className="font-medium text-foreground">{item.venueName}</p>
+                    )}
+                    {item.venueAddress && (
+                      <p className="opacity-70 text-[11px] leading-relaxed">{item.venueAddress}</p>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
 
             {item.mapsUrl && (

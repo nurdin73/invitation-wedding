@@ -64,7 +64,7 @@ function RegisterFormContent() {
 
       if (response.data?.token && response.data?.user) {
         saveAuthSession(response.data.token, response.data.user);
-        toast.success('Pendaftaran berhasil! Kami telah mengirim tautan verifikasi ke email Anda.');
+        toast.success('Pendaftaran berhasil! Selamat datang di Autora.');
         router.push('/dashboard');
       }
 

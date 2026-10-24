@@ -1,38 +1,31 @@
 'use client';
 
 import * as React from 'react';
-import type { SectionRenderProps, StorySectionData } from '../../types';
+import type { SectionRenderProps, StoryTimelineItem } from '../../types';
 import { Heart, Sparkles } from 'lucide-react';
 
-export const StoryTimeline: React.FC<SectionRenderProps<'story'>> = ({ data }) => {
-  const story = data as StorySectionData;
-  const stories = story.stories && story.stories.length > 0
-    ? story.stories
-    : [
-        {
-          id: '1',
-          year: '2020',
-          title: 'Pertemuan Pertama',
-          story: 'Kami pertama kali bertemu di sebuah kafe di Jakarta Selatan saat menghadiri acara komunitas bersama sahabat.',
-        },
-        {
-          id: '2',
-          year: '2022',
-          title: 'Menjalin Komitmen',
-          story: 'Setelah dua tahun saling mengenal dan berbagi cerita suka duka, kami memutuskan untuk melangkah ke jenjang yang lebih serius.',
-        },
-        {
-          id: '3',
-          year: '2026',
-          title: 'Lamaran & Menuju Pelaminan',
-          story: 'Di hadapan kedua keluarga besar, kami mengikrarkan niat tulus untuk menyempurnakan ibadah dalam ikatan suci pernikahan.',
-        },
-      ];
+export const StoryTimeline: React.FC<SectionRenderProps<'story'>> = ({
+  content,
+  copy,
+  isEditor,
+}) => {
+  const stories = (content?.story && content.story.length > 0)
+    ? content.story
+    : (isEditor
+        ? [
+            {
+              id: 'sample-story-1',
+              year: '2022',
+              title: 'Pertemuan Pertama',
+              story: 'Awal mula kisah cinta dan komitmen kami bermula.',
+            },
+          ]
+        : []);
 
   return (
     <section
       data-testid="section-story-timeline"
-      className="relative w-full py-16 px-6 text-center space-y-6 flex flex-col justify-center items-center min-h-[100dvh] min-h-screen"
+      className="relative w-full py-16 px-6 text-center space-y-6 flex flex-col justify-center items-center min-h-[60vh]"
       style={{
         backgroundColor: 'var(--inv-bg, #FAF8F5)',
         color: 'var(--inv-font-body, #3A302C)',
@@ -46,19 +39,19 @@ export const StoryTimeline: React.FC<SectionRenderProps<'story'>> = ({ data }) =
             color: 'var(--inv-primary, #B86B70)',
           }}
         >
-          {story.title || 'Kisah Cinta Kami (Love Story)'}
+          {copy?.title || 'Kisah Cinta Kami (Love Story)'}
         </h2>
-        <p className="text-xs opacity-70">
-          {story.subtitle || 'Perjalanan indah hingga kami berlabuh di pelaminan'}
+        <p className="text-xs opacity-70 max-w-sm mx-auto">
+          {copy?.subtitle || 'Perjalanan indah hingga kami berlabuh di pelaminan'}
         </p>
       </div>
 
-      <div className="max-w-sm mx-auto pt-4 relative text-left">
+      <div className="max-w-sm mx-auto pt-4 relative text-left w-full">
         {/* Central Vertical Timeline Guide */}
         <div className="absolute top-4 bottom-4 left-4 w-0.5 bg-current/15 -translate-x-1/2" />
 
         <div className="space-y-6 pl-8">
-          {stories.map((item, index) => (
+          {stories.map((item: StoryTimelineItem, index: number) => (
             <div key={item.id || index} className="relative group">
               {/* Bullet Node on Timeline */}
               <div

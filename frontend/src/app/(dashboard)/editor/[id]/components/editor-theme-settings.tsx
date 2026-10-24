@@ -1,13 +1,14 @@
 'use client';
 
-import { Palette, Type, Music } from 'lucide-react';
+import * as React from 'react';
+import { Palette, Type } from 'lucide-react';
 import { useInvitationEditorStore } from '@/lib/stores/invitation-editor.store';
 import {
   THEME_PALETTES,
   FONT_OPTIONS_HEADING,
   FONT_OPTIONS_BODY,
 } from '@/lib/style-helpers';
-import { AUDIO_PRESETS } from '@/modules/invitation-sections/audio-presets';
+import { TemplatePicker } from './design/template-picker';
 
 export const EditorThemeSettings: React.FC = () => {
   const themeConfig = useInvitationEditorStore((s) => s.themeConfig);
@@ -27,20 +28,14 @@ export const EditorThemeSettings: React.FC = () => {
 
   return (
     <div className="space-y-6 text-xs" data-testid="editor-theme-settings">
-      <div>
-        <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider mb-1">
-          Tema & Estetika Undangan
-        </h3>
-        <p className="text-[11px] text-muted-foreground">
-          Atur skema warna dasar, font editorial, dan visual kanvas.
-        </p>
-      </div>
+      {/* 1. Pemilihan Template Siap Pakai */}
+      <TemplatePicker />
 
-      {/* Preset Palettes */}
-      <div className="space-y-3">
+      {/* 2. Palet Warna Terkurasi */}
+      <div className="space-y-3 pt-3 border-t border-border">
         <label className="font-semibold text-foreground flex items-center gap-1.5">
           <Palette className="w-3.5 h-3.5 text-primary" />
-          <span>Palet Warna Terkurasi</span>
+          <span>Kustomisasi Palet Warna</span>
         </label>
 
         <div className="grid grid-cols-2 gap-2">
@@ -56,161 +51,72 @@ export const EditorThemeSettings: React.FC = () => {
                     ? 'border-primary ring-1 ring-primary bg-primary/5'
                     : 'border-border bg-card hover:border-primary/40'
                 }`}
+                data-testid={`theme-palette-${p.id}`}
               >
                 <div className="flex items-center gap-1.5">
                   <span
-                    className="w-4 h-4 rounded-full border border-black/10 shrink-0"
+                    className="w-4 h-4 rounded-full border border-black/10 shadow-2xs shrink-0"
                     style={{ backgroundColor: p.primaryColor }}
                   />
                   <span
-                    className="w-4 h-4 rounded-full border border-black/10 shrink-0"
+                    className="w-4 h-4 rounded-full border border-black/10 shadow-2xs shrink-0"
+                    style={{ backgroundColor: p.secondaryColor }}
+                  />
+                  <span
+                    className="w-4 h-4 rounded-full border border-black/10 shadow-2xs shrink-0"
                     style={{ backgroundColor: p.canvasBackground }}
                   />
                 </div>
-                <p className="font-medium text-[11px] text-foreground leading-tight">
-                  {p.name}
-                </p>
+                <div>
+                  <h5 className="font-medium text-xs leading-none text-foreground">{p.name}</h5>
+                </div>
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* Custom Color Codes */}
-      <div className="space-y-3 pt-2 border-t border-border">
-        <label className="font-semibold text-foreground block">
-          Kustomisasi Warna Hex
-        </label>
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <span className="block text-[11px] text-muted-foreground mb-1">
-              Warna Utama (Aksen)
-            </span>
-            <div className="flex items-center gap-2">
-              <input
-                type="color"
-                value={themeConfig.primaryColor || '#B86B70'}
-                onChange={(e) => updateThemeConfig({ primaryColor: e.target.value })}
-                className="w-7 h-7 rounded border border-border cursor-pointer bg-transparent"
-              />
-              <input
-                type="text"
-                value={themeConfig.primaryColor || '#B86B70'}
-                onChange={(e) => updateThemeConfig({ primaryColor: e.target.value })}
-                className="w-full rounded border border-input bg-background px-2 py-1 text-xs font-mono"
-              />
-            </div>
-          </div>
-
-          <div>
-            <span className="block text-[11px] text-muted-foreground mb-1">
-              Latar Belakang Kanvas
-            </span>
-            <div className="flex items-center gap-2">
-              <input
-                type="color"
-                value={themeConfig.canvasBackground || '#FAF8F5'}
-                onChange={(e) => updateThemeConfig({ canvasBackground: e.target.value })}
-                className="w-7 h-7 rounded border border-border cursor-pointer bg-transparent"
-              />
-              <input
-                type="text"
-                value={themeConfig.canvasBackground || '#FAF8F5'}
-                onChange={(e) => updateThemeConfig({ canvasBackground: e.target.value })}
-                className="w-full rounded border border-input bg-background px-2 py-1 text-xs font-mono"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Typography Pairing */}
-      <div className="space-y-3 pt-2 border-t border-border">
+      {/* 3. Tipografi Editorial */}
+      <div className="space-y-3 pt-3 border-t border-border">
         <label className="font-semibold text-foreground flex items-center gap-1.5">
           <Type className="w-3.5 h-3.5 text-primary" />
-          <span>Pasangan Tipografi</span>
+          <span>Tipografi Huruf</span>
         </label>
 
-        <div>
-          <span className="block text-[11px] text-muted-foreground mb-1">
-            Font Judul & Header (Serif / Editorial)
-          </span>
-          <select
-            value={themeConfig.headingFont || 'Playfair Display, serif'}
-            onChange={(e) => updateThemeConfig({ headingFont: e.target.value })}
-            className="w-full rounded-md border border-input bg-background px-2.5 py-1.5 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
-          >
-            {FONT_OPTIONS_HEADING.map((f) => (
-              <option key={f.value} value={f.value}>
-                {f.label}
-              </option>
-            ))}
-          </select>
-        </div>
+        <div className="space-y-3">
+          <div>
+            <label className="block text-[11px] font-medium mb-1 text-muted-foreground">
+              Font Judul (Heading)
+            </label>
+            <select
+              value={themeConfig.headingFont}
+              onChange={(e) => updateThemeConfig({ headingFont: e.target.value })}
+              className="w-full rounded-md border border-input bg-background px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-ring"
+            >
+              {FONT_OPTIONS_HEADING.map((f) => (
+                <option key={f.value} value={f.value}>
+                  {f.label}
+                </option>
+              ))}
+            </select>
+          </div>
 
-        <div>
-          <span className="block text-[11px] text-muted-foreground mb-1">
-            Font Teks Isi (Body / Sans)
-          </span>
-          <select
-            value={themeConfig.bodyFont || 'Plus Jakarta Sans, sans-serif'}
-            onChange={(e) => updateThemeConfig({ bodyFont: e.target.value })}
-            className="w-full rounded-md border border-input bg-background px-2.5 py-1.5 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
-          >
-            {FONT_OPTIONS_BODY.map((f) => (
-              <option key={f.value} value={f.value}>
-                {f.label}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      {/* Background Audio Settings */}
-      <div className="space-y-3 pt-2 border-t border-border">
-        <label className="font-semibold text-foreground flex items-center gap-1.5">
-          <Music className="w-3.5 h-3.5 text-primary" />
-          <span>Musik Latar (Background Audio)</span>
-        </label>
-        <p className="text-[11px] text-muted-foreground">
-          Musik otomatis diputar saat tamu mengklik tombol &quot;Buka Undangan&quot;.
-        </p>
-
-        <div className="space-y-2">
-          {AUDIO_PRESETS.map((track) => {
-            const isSelected = (themeConfig.audioUrl || AUDIO_PRESETS[0].url) === track.url;
-            return (
-              <button
-                key={track.id}
-                type="button"
-                onClick={() => updateThemeConfig({ audioUrl: track.url })}
-                className={`w-full p-2.5 rounded-lg border text-left transition-all flex items-center justify-between ${
-                  isSelected
-                    ? 'border-primary ring-1 ring-primary bg-primary/5 text-primary'
-                    : 'border-border bg-card hover:border-primary/40 text-foreground'
-                }`}
-              >
-                <div>
-                  <p className="font-medium text-[11px]">{track.title}</p>
-                  <p className="text-[10px] text-muted-foreground">{track.artist}</p>
-                </div>
-                {isSelected && <span className="text-[10px] font-bold">✓ Aktif</span>}
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="pt-1">
-          <label className="block text-[11px] text-muted-foreground mb-1">
-            Atau Tautan MP3 Kustom
-          </label>
-          <input
-            type="url"
-            value={themeConfig.audioUrl || ''}
-            onChange={(e) => updateThemeConfig({ audioUrl: e.target.value })}
-            placeholder="https://domain.com/musik-pernikahan.mp3"
-            className="w-full rounded-md border border-input bg-background px-2.5 py-1.5 text-xs text-foreground font-mono focus:outline-none focus:ring-1 focus:ring-ring"
-          />
+          <div>
+            <label className="block text-[11px] font-medium mb-1 text-muted-foreground">
+              Font Teks Konten (Body)
+            </label>
+            <select
+              value={themeConfig.bodyFont}
+              onChange={(e) => updateThemeConfig({ bodyFont: e.target.value })}
+              className="w-full rounded-md border border-input bg-background px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-ring"
+            >
+              {FONT_OPTIONS_BODY.map((f) => (
+                <option key={f.value} value={f.value}>
+                  {f.label}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
     </div>

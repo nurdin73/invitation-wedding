@@ -8,16 +8,17 @@ import { CanvasSectionWrapper } from '@/modules/invitation-sections/canvas-secti
 import { CoverGateOverlay } from '@/modules/invitation-sections/cover-gate-overlay';
 import { InvitationAudioPlayer } from '@/modules/invitation-sections/invitation-audio-player';
 import { EditorDeviceToolbar } from './editor-device-toolbar';
-import type { HeroSectionData } from '@/modules/invitation-sections/types';
 import { cn } from '@/lib/utils';
 
 export const EditorViewportCanvas: React.FC = () => {
   const invitation = useInvitationEditorStore((s) => s.invitation);
+  const content = useInvitationEditorStore((s) => s.content);
   const sections = useInvitationEditorStore((s) => s.sections);
   const themeConfig = useInvitationEditorStore((s) => s.themeConfig);
   const activeSectionId = useInvitationEditorStore((s) => s.activeSectionId);
   const viewportMode = useInvitationEditorStore((s) => s.viewportMode);
   const setActiveSection = useInvitationEditorStore((s) => s.setActiveSection);
+  const setActiveTab = useInvitationEditorStore((s) => s.setActiveTab);
   const moveSection = useInvitationEditorStore((s) => s.moveSection);
   const duplicateSection = useInvitationEditorStore((s) => s.duplicateSection);
   const deleteSection = useInvitationEditorStore((s) => s.deleteSection);
@@ -29,9 +30,9 @@ export const EditorViewportCanvas: React.FC = () => {
   const canvasStyle = generateCanvasStyleVars(themeConfig);
   const visibleSections = sections.filter((s) => s.isVisible);
 
-  // Ambil data nama pengantin dari Hero section untuk preview cover
-  const heroSection = sections.find((s) => s.type === 'hero');
-  const heroData = (heroSection?.data || {}) as HeroSectionData;
+  // Ambil nama mempelai dari canonical content untuk preview cover
+  const groomName = content.couple?.groom?.nickname || content.couple?.groom?.fullName || 'Pengantin Pria';
+  const brideName = content.couple?.bride?.nickname || content.couple?.bride?.fullName || 'Pengantin Wanita';
 
   const handleOpenInvitation = () => {
     setIsCoverOpen(true);
@@ -76,8 +77,8 @@ export const EditorViewportCanvas: React.FC = () => {
             isOpen={isCoverOpen}
             onOpen={handleOpenInvitation}
             title={invitation?.title || 'Undangan Pernikahan'}
-            groomName={heroData.groomName}
-            brideName={heroData.brideName}
+            groomName={groomName}
+            brideName={brideName}
             guestName="Bapak Budi Santoso & Keluarga"
             themeConfig={themeConfig}
             isEditor
@@ -104,7 +105,10 @@ export const EditorViewportCanvas: React.FC = () => {
                     isSelected={sec.id === activeSectionId}
                     isFirst={index === 0}
                     isLast={index === visibleSections.length - 1}
-                    onSelect={setActiveSection}
+                    onSelect={(id) => {
+                      setActiveSection(id);
+                      setActiveTab('inspector');
+                    }}
                     onMoveUp={(id) => moveSection(id, 'up')}
                     onMoveDown={(id) => moveSection(id, 'down')}
                     onDuplicate={duplicateSection}
@@ -112,7 +116,9 @@ export const EditorViewportCanvas: React.FC = () => {
                   >
                     <Component
                       id={sec.id}
-                      data={sec.data}
+                      content={content}
+                      copy={sec.copy}
+                      variant={sec.variant}
                       themeConfig={themeConfig}
                       isEditor
                     />
@@ -126,7 +132,7 @@ export const EditorViewportCanvas: React.FC = () => {
           <InvitationAudioPlayer
             isPlaying={isPlayingAudio}
             onTogglePlay={() => setIsPlayingAudio((prev) => !prev)}
-            audioUrl={themeConfig.audioUrl}
+            audioUrl={content.music?.audioUrl || themeConfig.audioUrl}
           />
         </div>
       </div>

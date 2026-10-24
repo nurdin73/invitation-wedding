@@ -9,50 +9,24 @@ export type SectionType =
   | 'gift'
   | 'footer';
 
-export interface BaseSectionData {
-  title?: string;
-  subtitle?: string;
+// ─── 1. KONTEN KANONIK (SINGLE SOURCE OF TRUTH) ─────────────────────────────
+
+export interface PersonProfile {
+  fullName: string;
+  nickname: string;
+  parents: string;
+  instagram?: string;
+  photoUrl?: string;
 }
 
-export interface HeroSectionData extends BaseSectionData {
-  groomName: string;
-  brideName: string;
-  weddingDate: string;
-  heroImageUrl?: string;
-  welcomeNote?: string;
-}
-
-export interface QuoteSectionData extends BaseSectionData {
-  quoteText: string;
-  sourceText: string;
-}
-
-export interface CoupleSectionData extends BaseSectionData {
-  groomFullName: string;
-  groomNickname: string;
-  groomParents: string;
-  groomInstagram?: string;
-  groomPhotoUrl?: string;
-
-  brideFullName: string;
-  brideNickname: string;
-  brideParents: string;
-  brideInstagram?: string;
-  bridePhotoUrl?: string;
-}
-
-export interface EventScheduleItem {
+export interface EventItem {
   id: string;
   eventName: string; // e.g. "Akad Nikah", "Resepsi Pernikahan"
-  date: string;
-  timeRange: string;
+  date: string; // 'YYYY-MM-DD'
+  timeRange: string; // e.g. "08:00 - 10:00 WIB"
   venueName: string;
   venueAddress: string;
   mapsUrl?: string;
-}
-
-export interface EventSectionData extends BaseSectionData {
-  events: EventScheduleItem[];
 }
 
 export interface StoryTimelineItem {
@@ -62,23 +36,10 @@ export interface StoryTimelineItem {
   story: string;
 }
 
-export interface StorySectionData extends BaseSectionData {
-  stories: StoryTimelineItem[];
-}
-
 export interface GalleryImageItem {
   id: string;
   url: string;
   caption?: string;
-}
-
-export interface GallerySectionData extends BaseSectionData {
-  images: GalleryImageItem[];
-}
-
-export interface RsvpSectionData extends BaseSectionData {
-  description?: string;
-  showAttendanceCount?: boolean;
 }
 
 export interface BankAccountItem {
@@ -89,36 +50,104 @@ export interface BankAccountItem {
   qrCodeUrl?: string;
 }
 
-export interface GiftSectionData extends BaseSectionData {
+export interface GiftConfig {
+  accounts: BankAccountItem[];
   giftAddress?: string;
   recipientName?: string;
   recipientPhone?: string;
-  accounts: BankAccountItem[];
 }
 
-export interface FooterSectionData extends BaseSectionData {
-  closingText: string;
-  thankYouNote: string;
+export interface MusicConfig {
+  audioUrl?: string;
+  isAutoplay: boolean;
 }
 
-export type SectionDataMap = {
-  hero: HeroSectionData;
-  quote: QuoteSectionData;
-  couple: CoupleSectionData;
-  event: EventSectionData;
-  story: StorySectionData;
-  gallery: GallerySectionData;
-  rsvp: RsvpSectionData;
-  gift: GiftSectionData;
-  footer: FooterSectionData;
+export interface QuoteConfig {
+  quoteText: string;
+  sourceText: string;
+}
+
+export interface InvitationContent {
+  couple: {
+    groom: PersonProfile;
+    bride: PersonProfile;
+  };
+  events: EventItem[];
+  quote: QuoteConfig;
+  story: StoryTimelineItem[];
+  gallery: GalleryImageItem[];
+  gift: GiftConfig;
+  music: MusicConfig;
+}
+
+// ─── 2. SEKSI LAYOUT & COPY (TEKS KHAS TIAP SEKSI) ──────────────────────────
+
+export interface HeroSectionCopy {
+  subtitle?: string;
+  welcomeNote?: string;
+}
+
+export interface QuoteSectionCopy {
+  title?: string;
+}
+
+export interface CoupleSectionCopy {
+  title?: string;
+  subtitle?: string;
+}
+
+export interface EventSectionCopy {
+  title?: string;
+  subtitle?: string;
+}
+
+export interface StorySectionCopy {
+  title?: string;
+  subtitle?: string;
+}
+
+export interface GallerySectionCopy {
+  title?: string;
+  subtitle?: string;
+}
+
+export interface RsvpSectionCopy {
+  title?: string;
+  subtitle?: string;
+  description?: string;
+  showAttendanceCount?: boolean;
+}
+
+export interface GiftSectionCopy {
+  title?: string;
+  subtitle?: string;
+}
+
+export interface FooterSectionCopy {
+  closingText?: string;
+  thankYouNote?: string;
+}
+
+export type SectionCopyMap = {
+  hero: HeroSectionCopy;
+  quote: QuoteSectionCopy;
+  couple: CoupleSectionCopy;
+  event: EventSectionCopy;
+  story: StorySectionCopy;
+  gallery: GallerySectionCopy;
+  rsvp: RsvpSectionCopy;
+  gift: GiftSectionCopy;
+  footer: FooterSectionCopy;
 };
+
+// ─── 3. STRUKTUR NODE & PROPS RENDERER ──────────────────────────────────────
 
 export interface SectionNode<TType extends SectionType = SectionType> {
   id: string;
   type: TType;
   variant: string;
   isVisible: boolean;
-  data: SectionDataMap[TType];
+  copy: SectionCopyMap[TType];
 }
 
 export interface ThemeConfig {
@@ -134,7 +163,9 @@ export interface ThemeConfig {
 
 export interface SectionRenderProps<TType extends SectionType = SectionType> {
   id: string;
-  data: SectionDataMap[TType];
+  content: InvitationContent;
+  copy: SectionCopyMap[TType];
+  variant?: string;
   themeConfig?: ThemeConfig;
   isEditor?: boolean;
 }

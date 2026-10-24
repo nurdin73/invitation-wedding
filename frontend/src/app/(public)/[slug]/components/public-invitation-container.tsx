@@ -2,11 +2,12 @@
 
 import * as React from 'react';
 import type { InvitationData } from '@/services/api/invitations.api';
-import type { SectionNode, HeroSectionData } from '@/modules/invitation-sections/types';
+import type { SectionNode, InvitationContent } from '@/modules/invitation-sections/types';
 import { generateCanvasStyleVars } from '@/lib/style-helpers';
 import { resolveSectionComponent } from '@/modules/invitation-sections/registry';
 import { CoverGateOverlay } from '@/modules/invitation-sections/cover-gate-overlay';
 import { InvitationAudioPlayer } from '@/modules/invitation-sections/invitation-audio-player';
+import { getCoupleDisplayNames } from '@/modules/invitation-sections/content-format.utils';
 import { cn } from '@/lib/utils';
 
 interface PublicInvitationContainerProps {
@@ -25,14 +26,15 @@ export const PublicInvitationContainer: React.FC<PublicInvitationContainerProps>
   const sections = (Array.isArray(invitation.sections) ? invitation.sections : []) as unknown as SectionNode[];
   const visibleSections = sections.filter((s) => s.isVisible);
 
-  // Ambil nama pengantin dari Hero section untuk cover
-  const heroSection = sections.find((s) => s.type === 'hero');
-  const heroData = (heroSection?.data || {}) as HeroSectionData;
+  const content = (invitation.content || {}) as InvitationContent;
+  const { groom, bride } = getCoupleDisplayNames(content?.couple);
 
   const handleOpenInvitation = () => {
     setIsCoverOpen(true);
     setIsPlayingAudio(true);
   };
+
+  const audioUrl = content?.music?.audioUrl || (invitation.themeConfig as Record<string, unknown>)?.audioUrl as string | undefined;
 
   return (
     <div
@@ -47,8 +49,8 @@ export const PublicInvitationContainer: React.FC<PublicInvitationContainerProps>
         isOpen={isCoverOpen}
         onOpen={handleOpenInvitation}
         title={invitation.title}
-        groomName={heroData.groomName}
-        brideName={heroData.brideName}
+        groomName={groom}
+        brideName={bride}
         guestName={guestName}
         themeConfig={invitation.themeConfig}
         isEditor={false}
@@ -71,7 +73,9 @@ export const PublicInvitationContainer: React.FC<PublicInvitationContainerProps>
               <Component
                 key={sec.id}
                 id={sec.id}
-                data={sec.data}
+                content={content}
+                copy={sec.copy}
+                variant={sec.variant}
                 themeConfig={invitation.themeConfig}
                 isEditor={false}
               />
@@ -84,7 +88,7 @@ export const PublicInvitationContainer: React.FC<PublicInvitationContainerProps>
       <InvitationAudioPlayer
         isPlaying={isPlayingAudio}
         onTogglePlay={() => setIsPlayingAudio((prev) => !prev)}
-        audioUrl={invitation.themeConfig?.audioUrl as string | undefined}
+        audioUrl={audioUrl}
       />
     </div>
   );

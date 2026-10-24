@@ -1,17 +1,30 @@
 'use client';
 
 import * as React from 'react';
-import type { SectionRenderProps, HeroSectionData } from '../../types';
+import type { SectionRenderProps } from '../../types';
 import { Heart, Calendar } from 'lucide-react';
 import { CountdownTimer } from '../../components/countdown-timer';
+import {
+  getMainWeddingDate,
+  getMainWeddingISODate,
+  getCoupleDisplayNames,
+} from '../../content-format.utils';
 
-export const HeroClassic: React.FC<SectionRenderProps<'hero'>> = ({ data }) => {
-  const hero = data as HeroSectionData;
+export const HeroClassic: React.FC<SectionRenderProps<'hero'>> = ({
+  content,
+  copy,
+  isEditor,
+}) => {
+  const { groom, bride } = getCoupleDisplayNames(content?.couple);
+  const displayGroom = groom || (isEditor ? 'Nama Mempelai Pria' : '');
+  const displayBride = bride || (isEditor ? 'Nama Mempelai Wanita' : '');
+  const formattedDate = getMainWeddingDate(content?.events);
+  const isoDate = getMainWeddingISODate(content?.events);
 
   return (
     <section
       data-testid="section-hero-classic"
-      className="relative w-full py-12 px-6 text-center flex flex-col items-center justify-center min-h-[100dvh] min-h-screen overflow-hidden"
+      className="relative w-full py-16 px-6 text-center flex flex-col items-center justify-center min-h-[100dvh] min-h-screen overflow-hidden"
       style={{
         backgroundColor: 'var(--inv-bg, #FAF8F5)',
         color: 'var(--inv-font-body, #3A302C)',
@@ -23,7 +36,7 @@ export const HeroClassic: React.FC<SectionRenderProps<'hero'>> = ({ data }) => {
       <div className="relative z-10 max-w-sm mx-auto space-y-4">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-current/20 text-xs tracking-widest uppercase font-medium">
           <Heart className="w-3 h-3 text-[var(--inv-primary)] fill-current" />
-          <span>{hero.subtitle || 'The Wedding Celebration'}</span>
+          <span>{copy?.subtitle || 'The Wedding Celebration'}</span>
         </div>
 
         <h1
@@ -33,26 +46,26 @@ export const HeroClassic: React.FC<SectionRenderProps<'hero'>> = ({ data }) => {
             color: 'var(--inv-primary, #B86B70)',
           }}
         >
-          {hero.groomName || 'Romeo'}
+          {displayGroom}
           <span className="block text-2xl my-1 opacity-70 font-light">&</span>
-          {hero.brideName || 'Juliet'}
+          {displayBride}
         </h1>
 
-        {hero.weddingDate && (
+        {formattedDate && (
           <div className="pt-2 flex items-center justify-center gap-2 text-xs opacity-80 tracking-wide font-medium">
             <Calendar className="w-3.5 h-3.5 text-[var(--inv-primary)]" />
-            <span>{hero.weddingDate}</span>
+            <span>{formattedDate}</span>
           </div>
         )}
 
-        {hero.welcomeNote && (
+        {copy?.welcomeNote && (
           <p className="pt-2 text-xs leading-relaxed max-w-xs mx-auto opacity-75">
-            {hero.welcomeNote}
+            {copy.welcomeNote}
           </p>
         )}
 
         {/* Countdown Timer Menuju Hari H */}
-        <CountdownTimer targetDate={hero.weddingDate} />
+        <CountdownTimer targetDate={isoDate} />
       </div>
     </section>
   );

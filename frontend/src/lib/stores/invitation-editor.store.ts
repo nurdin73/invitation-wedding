@@ -2,13 +2,20 @@
 
 import { create } from 'zustand';
 import type { InvitationData } from '@/services/api/invitations.api';
-import type { SectionNode, SectionType, ThemeConfig, SectionDataMap } from '@/modules/invitation-sections/types';
+import type {
+  SectionNode,
+  SectionType,
+  ThemeConfig,
+  InvitationContent,
+  SectionCopyMap,
+} from '@/modules/invitation-sections/types';
 
-export type EditorTab = 'sections' | 'inspector' | 'theme';
+export type EditorTab = 'content' | 'design' | 'sections' | 'inspector';
 export type ViewportMode = 'mobile' | 'tablet' | 'full';
 
 interface EditorState {
   invitation: InvitationData | null;
+  content: InvitationContent;
   sections: SectionNode[];
   themeConfig: ThemeConfig;
   activeSectionId: string | null;
@@ -23,85 +30,64 @@ interface EditorState {
   setActiveSection: (id: string | null) => void;
   setActiveTab: (tab: EditorTab) => void;
   setViewportMode: (mode: ViewportMode) => void;
+
+  // Content actions
+  updateContent: (patch: Partial<InvitationContent>) => void;
+  updateCouple: (patch: Partial<InvitationContent['couple']>) => void;
+  updateEvents: (events: InvitationContent['events']) => void;
+  updateQuote: (quote: InvitationContent['quote']) => void;
+  updateStory: (story: InvitationContent['story']) => void;
+  updateGallery: (gallery: InvitationContent['gallery']) => void;
+  updateGift: (gift: InvitationContent['gift']) => void;
+  updateMusic: (music: InvitationContent['music']) => void;
+
+  // Section layout actions
   reorderSections: (fromIndex: number, toIndex: number) => void;
   moveSection: (id: string, direction: 'up' | 'down') => void;
   addSection: (type: SectionType, variant?: string) => void;
-  updateSectionData: (id: string, patch: Record<string, unknown>) => void;
+  updateSectionCopy: (id: string, copyPatch: Record<string, unknown>) => void;
   updateSectionVariant: (id: string, variant: string) => void;
   toggleSectionVisibility: (id: string) => void;
   duplicateSection: (id: string) => void;
   deleteSection: (id: string) => void;
+
+  // Theme & Template actions
   updateThemeConfig: (config: Partial<ThemeConfig>) => void;
+  applyTemplateLocally: (themeConfig: ThemeConfig, newSections: SectionNode[]) => void;
+
+  // Save & publish meta
   setSaving: (saving: boolean) => void;
   setPublishing: (publishing: boolean) => void;
   markSaved: (updatedInvitation: InvitationData) => void;
 }
 
-function getDefaultSectionData(type: SectionType, title = 'Wedding Celebration'): SectionDataMap[SectionType] {
+function getDefaultSectionCopy(type: SectionType): SectionCopyMap[SectionType] {
   switch (type) {
     case 'hero':
       return {
-        title,
         subtitle: 'The Wedding Celebration',
-        groomName: 'Romeo',
-        brideName: 'Juliet',
-        weddingDate: 'Sabtu, 28 Oktober 2026',
-        welcomeNote: 'Dengan penuh rasa syukur, kami mengundang Anda untuk hadir dalam momen bahagia pernikahan kami.',
+        welcomeNote:
+          'Dengan penuh rasa syukur dan sukacita, kami mengundang Anda untuk hadir dalam momen bahagia pernikahan kami.',
       };
     case 'quote':
       return {
         title: 'Kutipan Suci',
-        quoteText: 'Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri...',
-        sourceText: 'QS. Ar-Rum: 21',
       };
     case 'couple':
       return {
         title: 'Mempelai Pengantin',
-        subtitle: 'Dengan memohon rahmat dan ridho Allah SWT, kami bermaksud mengumumkan pernikahan putra-putri kami:',
-        groomFullName: 'Romeo Montague, S.T.',
-        groomNickname: 'Romeo',
-        groomParents: 'Putra tercinta Bpk. Montague & Ibu Montague',
-        groomInstagram: 'romeomontague',
-        brideFullName: 'Juliet Capulet, S.Farm.',
-        brideNickname: 'Juliet',
-        brideParents: 'Putri tercinta Bpk. Capulet & Ibu Capulet',
-        brideInstagram: 'julietcapulet',
+        subtitle:
+          'Dengan memohon rahmat dan ridho Allah SWT, kami bermaksud mengumumkan pernikahan putra-putri kami:',
       };
     case 'event':
       return {
         title: 'Agenda Acara',
         subtitle: 'Rangkaian momen bahagia pernikahan kami',
-        events: [
-          {
-            id: 'event-1',
-            eventName: 'Akad Nikah',
-            date: 'Sabtu, 28 Oktober 2026',
-            timeRange: '08:00 - 10:00 WIB',
-            venueName: 'Masjid Agung Al-Azhar',
-            venueAddress: 'Jl. Sisingamangaraja, Kebayoran Baru, Jakarta Selatan',
-            mapsUrl: 'https://maps.google.com',
-          },
-          {
-            id: 'event-2',
-            eventName: 'Resepsi Pernikahan',
-            date: 'Sabtu, 28 Oktober 2026',
-            timeRange: '11:00 - 14:00 WIB',
-            venueName: 'Grand Ballroom Hotel Mulia',
-            venueAddress: 'Jl. Asia Afrika, Senayan, Jakarta Pusat',
-            mapsUrl: 'https://maps.google.com',
-          },
-        ],
       };
     case 'gallery':
       return {
         title: 'Momen Bahagia',
         subtitle: 'Galeri potret kenangan kebersamaan kami',
-        images: [
-          { id: 'img-1', url: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=600&q=80', caption: 'Pre-wedding' },
-          { id: 'img-2', url: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=600&q=80', caption: 'Romantic Sunset' },
-          { id: 'img-3', url: 'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=600&q=80', caption: 'Engagement' },
-          { id: 'img-4', url: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=600&q=80', caption: 'Together' },
-        ],
       };
     case 'rsvp':
       return {
@@ -113,43 +99,70 @@ function getDefaultSectionData(type: SectionType, title = 'Wedding Celebration')
       return {
         title: 'Tanda Kasih (Wedding Gift)',
         subtitle: 'Doa restu Anda merupakan karunia terindah bagi kami. Namun jika berkenan memberikan tanda kasih, dapat disalurkan melalui rekening berikut:',
-        giftAddress: 'Jl. Melati No. 12, Senayan, Jakarta Pusat 10270',
-        recipientName: 'Romeo Montague',
-        recipientPhone: '08123456789',
-        accounts: [
-          {
-            id: 'acc-1',
-            bankName: 'BCA',
-            accountNumber: '1234567890',
-            accountHolder: 'Romeo Montague',
-          },
-          {
-            id: 'acc-2',
-            bankName: 'Mandiri',
-            accountNumber: '9876543210',
-            accountHolder: 'Juliet Capulet',
-          },
-        ],
       };
     case 'footer':
       return {
-        title: 'Penutup',
         closingText: 'Terima Kasih',
-        thankYouNote: 'Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu kepada kami.',
+        thankYouNote:
+          'Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu kepada kami.',
       };
     case 'story':
       return {
         title: 'Kisah Kami',
-        stories: [
-          { id: 'st-1', year: '2020', title: 'Pertama Bertemu', story: 'Pertemuan pertama kami di bangku kuliah.' },
-          { id: 'st-2', year: '2024', title: 'Lamaran', story: 'Momen sakral saat kami sepakat melangkah ke jenjang pernikahan.' },
-        ],
+        subtitle: 'Perjalanan cinta kami menuju hari bahagia',
       };
   }
 }
 
+function createDefaultContent(): InvitationContent {
+  return {
+    couple: {
+      groom: { fullName: '', nickname: '', parents: '', instagram: '', photoUrl: '' },
+      bride: { fullName: '', nickname: '', parents: '', instagram: '', photoUrl: '' },
+    },
+    events: [
+      {
+        id: 'event-akad',
+        eventName: 'Akad Nikah',
+        date: '',
+        timeRange: '08:00 - 10:00 WIB',
+        venueName: '',
+        venueAddress: '',
+        mapsUrl: '',
+      },
+      {
+        id: 'event-resepsi',
+        eventName: 'Resepsi Pernikahan',
+        date: '',
+        timeRange: '11:00 - 13:00 WIB',
+        venueName: '',
+        venueAddress: '',
+        mapsUrl: '',
+      },
+    ],
+    quote: {
+      quoteText:
+        'Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya, dan Dia menjadikan di antaramu rasa kasih dan sayang.',
+      sourceText: 'QS. Ar-Rum: 21',
+    },
+    story: [],
+    gallery: [],
+    gift: {
+      accounts: [],
+      giftAddress: '',
+      recipientName: '',
+      recipientPhone: '',
+    },
+    music: {
+      audioUrl: '',
+      isAutoplay: false,
+    },
+  };
+}
+
 export const useInvitationEditorStore = create<EditorState>((set, get) => ({
   invitation: null,
+  content: createDefaultContent(),
   sections: [],
   themeConfig: {
     paletteId: 'dusty-rose',
@@ -160,25 +173,30 @@ export const useInvitationEditorStore = create<EditorState>((set, get) => ({
     bodyFont: 'Plus Jakarta Sans, sans-serif',
   },
   activeSectionId: null,
-  activeTab: 'sections',
+  activeTab: 'content',
   viewportMode: 'mobile',
   isDirty: false,
   isSaving: false,
   isPublishing: false,
 
   initEditor: (invitation: InvitationData) => {
-    // Parse sections and ensure valid defaults
+    // 1. Ekstrak canonical content
+    const rawContent = (invitation.content && typeof invitation.content === 'object' && Object.keys(invitation.content).length > 0)
+      ? (invitation.content as unknown as InvitationContent)
+      : createDefaultContent();
+
+    // 2. Ekstrak layout sections
     const rawSections = (Array.isArray(invitation.sections) && invitation.sections.length > 0)
       ? (invitation.sections as unknown as SectionNode[])
       : [
-          { id: 'sec-hero', type: 'hero' as SectionType, variant: 'classic', isVisible: true, data: getDefaultSectionData('hero', invitation.title) },
-          { id: 'sec-quote', type: 'quote' as SectionType, variant: 'sacred', isVisible: true, data: getDefaultSectionData('quote') },
-          { id: 'sec-couple', type: 'couple' as SectionType, variant: 'side-by-side', isVisible: true, data: getDefaultSectionData('couple') },
-          { id: 'sec-event', type: 'event' as SectionType, variant: 'cards', isVisible: true, data: getDefaultSectionData('event') },
-          { id: 'sec-gallery', type: 'gallery' as SectionType, variant: 'grid', isVisible: true, data: getDefaultSectionData('gallery') },
-          { id: 'sec-rsvp', type: 'rsvp' as SectionType, variant: 'interactive', isVisible: true, data: getDefaultSectionData('rsvp') },
-          { id: 'sec-gift', type: 'gift' as SectionType, variant: 'bank-cards', isVisible: true, data: getDefaultSectionData('gift') },
-          { id: 'sec-footer', type: 'footer' as SectionType, variant: 'closing', isVisible: true, data: getDefaultSectionData('footer') },
+          { id: 'sec-hero-1', type: 'hero' as SectionType, variant: 'classic', isVisible: true, copy: getDefaultSectionCopy('hero') },
+          { id: 'sec-quote-1', type: 'quote' as SectionType, variant: 'sacred', isVisible: true, copy: getDefaultSectionCopy('quote') },
+          { id: 'sec-couple-1', type: 'couple' as SectionType, variant: 'side-by-side', isVisible: true, copy: getDefaultSectionCopy('couple') },
+          { id: 'sec-event-1', type: 'event' as SectionType, variant: 'cards', isVisible: true, copy: getDefaultSectionCopy('event') },
+          { id: 'sec-gallery-1', type: 'gallery' as SectionType, variant: 'grid', isVisible: true, copy: getDefaultSectionCopy('gallery') },
+          { id: 'sec-rsvp-1', type: 'rsvp' as SectionType, variant: 'interactive', isVisible: true, copy: getDefaultSectionCopy('rsvp') },
+          { id: 'sec-gift-1', type: 'gift' as SectionType, variant: 'bank-cards', isVisible: true, copy: getDefaultSectionCopy('gift') },
+          { id: 'sec-footer-1', type: 'footer' as SectionType, variant: 'closing', isVisible: true, copy: getDefaultSectionCopy('footer') },
         ];
 
     const currentTheme: ThemeConfig = {
@@ -193,10 +211,11 @@ export const useInvitationEditorStore = create<EditorState>((set, get) => ({
 
     set({
       invitation,
+      content: rawContent,
       sections: rawSections,
       themeConfig: currentTheme,
       activeSectionId: rawSections[0]?.id || null,
-      activeTab: 'sections',
+      activeTab: 'content',
       isDirty: false,
       isSaving: false,
       isPublishing: false,
@@ -218,6 +237,72 @@ export const useInvitationEditorStore = create<EditorState>((set, get) => ({
     set({ viewportMode });
   },
 
+  // Content Handlers
+  updateContent: (patch: Partial<InvitationContent>) => {
+    set((state) => ({
+      content: { ...state.content, ...patch },
+      isDirty: true,
+    }));
+  },
+
+  updateCouple: (patch: Partial<InvitationContent['couple']>) => {
+    set((state) => ({
+      content: {
+        ...state.content,
+        couple: { ...state.content.couple, ...patch },
+      },
+      isDirty: true,
+    }));
+  },
+
+  updateEvents: (events: InvitationContent['events']) => {
+    set((state) => ({
+      content: { ...state.content, events },
+      isDirty: true,
+    }));
+  },
+
+  updateQuote: (quote: InvitationContent['quote']) => {
+    set((state) => ({
+      content: { ...state.content, quote },
+      isDirty: true,
+    }));
+  },
+
+  updateStory: (story: InvitationContent['story']) => {
+    set((state) => ({
+      content: { ...state.content, story },
+      isDirty: true,
+    }));
+  },
+
+  updateGallery: (gallery: InvitationContent['gallery']) => {
+    set((state) => ({
+      content: { ...state.content, gallery },
+      isDirty: true,
+    }));
+  },
+
+  updateGift: (gift: InvitationContent['gift']) => {
+    set((state) => ({
+      content: { ...state.content, gift },
+      isDirty: true,
+    }));
+  },
+
+  updateMusic: (music: InvitationContent['music']) => {
+    set((state) => ({
+      content: { ...state.content, music },
+      themeConfig: {
+        ...state.themeConfig,
+        audioUrl: music.audioUrl,
+        isAutoplayMusic: music.isAutoplay,
+      },
+      isDirty: true,
+    }));
+  },
+
+  // Section Layout Handlers
   reorderSections: (fromIndex: number, toIndex: number) => {
     set((state) => {
       const next = [...state.sections];
@@ -247,7 +332,7 @@ export const useInvitationEditorStore = create<EditorState>((set, get) => ({
         type,
         variant,
         isVisible: true,
-        data: getDefaultSectionData(type, state.invitation?.title || 'Wedding'),
+        copy: getDefaultSectionCopy(type),
       };
 
       const nextSections = [...state.sections, newSection];
@@ -260,11 +345,11 @@ export const useInvitationEditorStore = create<EditorState>((set, get) => ({
     });
   },
 
-  updateSectionData: (id: string, patch: Record<string, unknown>) => {
+  updateSectionCopy: (id: string, copyPatch: Record<string, unknown>) => {
     set((state) => ({
       sections: state.sections.map((sec) =>
         sec.id === id
-          ? { ...sec, data: { ...sec.data, ...patch } as SectionNode['data'] }
+          ? { ...sec, copy: { ...(sec.copy || {}), ...copyPatch } as SectionNode['copy'] }
           : sec
       ),
       isDirty: true,
@@ -298,7 +383,7 @@ export const useInvitationEditorStore = create<EditorState>((set, get) => ({
       const duplicated: SectionNode = {
         ...target,
         id: `sec-${target.type}-${Date.now().toString(36)}`,
-        data: JSON.parse(JSON.stringify(target.data)),
+        copy: JSON.parse(JSON.stringify(target.copy || {})),
       };
 
       const next = [...state.sections];
@@ -330,6 +415,14 @@ export const useInvitationEditorStore = create<EditorState>((set, get) => ({
       themeConfig: { ...state.themeConfig, ...config },
       isDirty: true,
     }));
+  },
+
+  applyTemplateLocally: (themeConfig: ThemeConfig, newSections: SectionNode[]) => {
+    set({
+      themeConfig,
+      sections: newSections,
+      isDirty: true,
+    });
   },
 
   setSaving: (isSaving: boolean) => {
