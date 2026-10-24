@@ -6,8 +6,7 @@ import type { IUserRepository } from '../../outbound/user-repository.port';
 import type { CheckoutResult, IBillingService, SubscriptionStatus } from '../billing.service';
 
 const PLAN_PRICES: Record<string, number> = {
-  PRO: 149000,
-  PLATINUM: 299000,
+  PRO: 49000,
 };
 
 export class BillingServiceImplement implements IBillingService {
@@ -24,7 +23,7 @@ export class BillingServiceImplement implements IBillingService {
     if (!amount) {
       throw new AppDomainError(
         META_CODES.SCHEMA_VALIDATION_ERROR,
-        `Paket langganan "${plan}" tidak valid. Pilihan yang tersedia: PRO, PLATINUM.`,
+        `Paket langganan "${plan}" tidak valid. Pilihan yang tersedia: PRO.`,
         400
       );
     }

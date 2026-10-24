@@ -63,7 +63,7 @@ export const ProUpgradeDialog: React.FC = () => {
               Paket PRO Lengkap
             </span>
             <span className="text-2xl font-bold text-foreground">
-              Rp 149.000
+              Rp 49.000
             </span>
           </div>
           <span className="text-[11px] text-primary font-semibold bg-primary/10 px-2 py-0.5 rounded-md">

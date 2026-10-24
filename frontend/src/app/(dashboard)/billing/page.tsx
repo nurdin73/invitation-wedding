@@ -78,7 +78,7 @@ export default function BillingPage() {
     };
   }, [setHeader, resetHeader, fetchSubscription]);
 
-  const handleCheckout = async (plan: 'PRO' | 'PLATINUM') => {
+  const handleCheckout = async (plan: 'PRO' = 'PRO') => {
     setIsProcessing(true);
     try {
       const res = await billingApi.checkout(plan);
@@ -94,23 +94,23 @@ export default function BillingPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-5xl" data-testid="billing-page">
+    <div className="space-y-6 max-w-4xl" data-testid="billing-page">
       {isLoading ? (
         <div className="p-8 text-center text-sm text-muted-foreground">Memuat info paket...</div>
       ) : (
-        <div className="rounded-xl border bg-card p-6 shadow-sm mb-6">
+        <div className="rounded-2xl border bg-card p-6 shadow-xs">
           <div className="flex items-center justify-between">
             <div>
-              <span className="text-xs uppercase font-medium text-muted-foreground">Paket Saat Ini</span>
+              <span className="text-xs uppercase font-medium text-muted-foreground tracking-wider">Status Akun Saat Ini</span>
               <h2 className="text-xl font-bold text-foreground">
-                {subInfo?.plan || 'FREE'}
+                {subInfo?.isSubscriberActive ? 'Paket PRO' : 'Paket Starter (Gratis)'}
               </h2>
             </div>
             <span
-              className={`rounded-full px-3 py-1 text-xs font-semibold ${
+              className={`rounded-full px-3.5 py-1 text-xs font-semibold ${
                 subInfo?.isSubscriberActive
                   ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-400'
-                  : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
+                  : 'bg-muted text-muted-foreground'
               }`}
             >
               {subInfo?.isSubscriberActive ? 'Aktif' : 'Gratis'}
@@ -119,61 +119,83 @@ export default function BillingPage() {
         </div>
       )}
 
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Paket PRO */}
-        <div className="rounded-xl border bg-card p-6 shadow-sm flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="font-bold text-lg text-foreground">Paket PRO</h3>
-              <span className="text-sm font-semibold text-primary">Rp 149.000</span>
-            </div>
-            <p className="text-sm text-muted-foreground mb-4">
-              Pilihan ideal untuk pasangan yang menginginkan kustomisasi tema penuh dan musik latar.
-            </p>
-            <ul className="space-y-2 text-sm text-foreground mb-6">
-              <li>✓ Publikasi hingga 5 Undangan Aktif</li>
-              <li>✓ Kustomisasi Font & Warna Tak Terbatas</li>
-              <li>✓ Musik Latar Autoplay</li>
-              <li>✓ Galeri Foto hingga 20 File WebP</li>
-            </ul>
-          </div>
-          <Button
-            onClick={() => handleCheckout('PRO')}
-            disabled={isProcessing}
-            className="w-full"
-            data-testid="billing-checkout-pro-btn"
-          >
-            Upgrade ke Paket PRO
-          </Button>
+      {/* Paket PRO Card */}
+      <div className="rounded-2xl border-2 border-primary bg-card p-6 sm:p-8 shadow-sm relative overflow-hidden">
+        <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-xs font-semibold px-4 py-1 rounded-bl-xl shadow-xs">
+          Paling Diminati
         </div>
 
-        {/* Paket PLATINUM */}
-        <div className="rounded-xl border-2 border-primary bg-card p-6 shadow-sm flex flex-col justify-between relative">
-          <div className="absolute -top-3 right-4 rounded-full bg-primary px-3 py-0.5 text-xs font-medium text-primary-foreground">
-            Paling Populer
-          </div>
+        <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 pb-6 border-b border-border">
           <div>
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="font-bold text-lg text-foreground">Paket PLATINUM</h3>
-              <span className="text-sm font-semibold text-primary">Rp 299.000</span>
+            <div className="inline-flex items-center gap-2 mb-1">
+              <h3 className="font-bold text-2xl text-foreground font-sans">Paket PRO</h3>
             </div>
-            <p className="text-sm text-muted-foreground mb-4">
-              Fitur terlengkap untuk pengalaman pernikahan digital mewah tanpa kompromi.
+            <p className="text-sm text-muted-foreground max-w-xl leading-relaxed">
+              Pilihan lengkap sekali bayar untuk hari bahagia Anda dengan seluruh fitur eksklusif tanpa batasan.
             </p>
-            <ul className="space-y-2 text-sm text-foreground mb-6">
-              <li>✓ Publikasi Undangan Tanpa Batas</li>
-              <li>✓ Custom Subdomain / Domain Sendiri</li>
-              <li>✓ Buku Tamu Digital & QR Check-in</li>
-              <li>✓ Prioritas Layanan Dukungan Pelanggan</li>
-            </ul>
           </div>
+          <div className="md:text-right shrink-0">
+            <div className="text-3xl font-extrabold text-foreground font-sans">
+              Rp 49.000
+            </div>
+            <span className="text-xs text-muted-caption">
+              sekali bayar per acara
+            </span>
+          </div>
+        </div>
+
+        {/* Feature List */}
+        <div className="mt-6">
+          <span className="text-xs font-semibold uppercase tracking-wider text-muted-caption block mb-3">
+            Fasilitas yang Didapat:
+          </span>
+          <div className="grid sm:grid-cols-2 gap-3 text-sm">
+            <div className="flex items-center gap-2 text-foreground">
+              <span className="text-primary font-bold">✓</span>
+              <span>Masa aktif undangan hingga acara selesai</span>
+            </div>
+            <div className="flex items-center gap-2 text-foreground">
+              <span className="text-primary font-bold">✓</span>
+              <span>Buka semua tema & template eksklusif</span>
+            </div>
+            <div className="flex items-center gap-2 text-foreground">
+              <span className="text-primary font-bold">✓</span>
+              <span>Musik latar romantis autoplay</span>
+            </div>
+            <div className="flex items-center gap-2 text-foreground">
+              <span className="text-primary font-bold">✓</span>
+              <span>Amplop digital & nomor rekening bank / QRIS</span>
+            </div>
+            <div className="flex items-center gap-2 text-foreground">
+              <span className="text-primary font-bold">✓</span>
+              <span>Kisah perjalanan cinta (Love Story Timeline)</span>
+            </div>
+            <div className="flex items-center gap-2 text-foreground">
+              <span className="text-primary font-bold">✓</span>
+              <span>Galeri foto hingga 15 foto resolusi optimal</span>
+            </div>
+            <div className="flex items-center gap-2 text-foreground">
+              <span className="text-primary font-bold">✓</span>
+              <span>Buku ucapan, doa & konfirmasi kehadiran (RSVP)</span>
+            </div>
+            <div className="flex items-center gap-2 text-foreground">
+              <span className="text-primary font-bold">✓</span>
+              <span>Peta petunjuk arah Google Maps & navigasi</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-8 pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-muted-caption">
+            Pembayaran otomatis diverifikasi via Snap Midtrans (QRIS, GoPay, ShopeePay, Virtual Account, & Kartu Kredit).
+          </p>
           <Button
-            onClick={() => handleCheckout('PLATINUM')}
-            disabled={isProcessing}
-            className="w-full"
-            data-testid="billing-checkout-platinum-btn"
+            onClick={() => handleCheckout('PRO')}
+            disabled={isProcessing || Boolean(subInfo?.isSubscriberActive)}
+            className="w-full sm:w-auto min-w-[220px] font-semibold"
+            data-testid="billing-checkout-pro-btn"
           >
-            Pilih Paket PLATINUM
+            {subInfo?.isSubscriberActive ? 'Paket PRO Sudah Aktif' : 'Upgrade ke Paket PRO'}
           </Button>
         </div>
       </div>

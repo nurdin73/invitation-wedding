@@ -79,7 +79,7 @@ export const ProFeatureLock: React.FC<ProFeatureLockProps> = ({
           <ArrowRight className="w-3.5 h-3.5" />
         </Button>
         <p className="text-[10px] text-center text-muted-foreground mt-1.5">
-          Sekali bayar Rp 149.000 untuk seluruh fitur eksklusif tanpa batasan.
+          Sekali bayar Rp 49.000 untuk seluruh fitur eksklusif tanpa batasan.
         </p>
       </div>
 

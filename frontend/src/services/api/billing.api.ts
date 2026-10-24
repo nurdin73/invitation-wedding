@@ -14,7 +14,7 @@ export interface SubscriptionInfo {
 }
 
 export const billingApi = {
-  async checkout(plan: 'PRO' | 'PLATINUM') {
+  async checkout(plan: 'PRO' = 'PRO') {
     const res = await apiClient.post<ApiResponse<CheckoutSession>>('/billing/checkout', { plan });
     return res.data;
   },
