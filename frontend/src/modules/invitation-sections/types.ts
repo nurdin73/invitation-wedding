@@ -142,12 +142,22 @@ export type SectionCopyMap = {
 
 // ─── 3. STRUKTUR NODE & PROPS RENDERER ──────────────────────────────────────
 
+export type FrameStyle = 'none' | 'classic-border' | 'floral-corners' | 'card-box' | 'arch-window';
+
+export interface SectionStyleConfig {
+  backgroundImageUrl?: string;
+  backgroundOverlayOpacity?: number; // 0 - 90
+  backgroundColor?: string;
+  frameStyle?: FrameStyle;
+}
+
 export interface SectionNode<TType extends SectionType = SectionType> {
   id: string;
   type: TType;
   variant: string;
   isVisible: boolean;
   copy: SectionCopyMap[TType];
+  style?: SectionStyleConfig;
 }
 
 export interface ThemeConfig {
@@ -168,4 +178,6 @@ export interface SectionRenderProps<TType extends SectionType = SectionType> {
   variant?: string;
   themeConfig?: ThemeConfig;
   isEditor?: boolean;
+  style?: SectionStyleConfig;
+  invitationId?: string;
 }

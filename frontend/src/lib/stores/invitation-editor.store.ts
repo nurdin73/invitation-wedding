@@ -9,6 +9,7 @@ import type {
   ThemeConfig,
   InvitationContent,
   SectionCopyMap,
+  SectionStyleConfig,
 } from '@/modules/invitation-sections/types';
 
 export type EditorTab = 'content' | 'design' | 'sections' | 'inspector';
@@ -48,6 +49,7 @@ interface EditorState {
   addSection: (type: SectionType, variant?: string) => void;
   updateSectionCopy: (id: string, copyPatch: Record<string, unknown>) => void;
   updateSectionVariant: (id: string, variant: string) => void;
+  updateSectionStyle: (id: string, stylePatch: Partial<SectionStyleConfig>) => void;
   toggleSectionVisibility: (id: string) => void;
   duplicateSection: (id: string) => void;
   deleteSection: (id: string) => void;
@@ -371,6 +373,17 @@ export const useInvitationEditorStore = create<EditorState>((set, get) => ({
     set((state) => ({
       sections: state.sections.map((sec) =>
         sec.id === id ? { ...sec, variant } : sec
+      ),
+      isDirty: true,
+    }));
+  },
+
+  updateSectionStyle: (id: string, stylePatch: Partial<SectionStyleConfig>) => {
+    set((state) => ({
+      sections: state.sections.map((sec) =>
+        sec.id === id
+          ? { ...sec, style: { ...(sec.style || {}), ...stylePatch } }
+          : sec
       ),
       isDirty: true,
     }));

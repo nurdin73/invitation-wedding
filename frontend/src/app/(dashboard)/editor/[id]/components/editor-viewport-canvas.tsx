@@ -122,6 +122,8 @@ export const EditorViewportCanvas: React.FC = () => {
                       variant={sec.variant}
                       themeConfig={themeConfig}
                       isEditor
+                      style={sec.style}
+                      invitationId={invitation?.id}
                     />
                   </CanvasSectionWrapper>
                 );

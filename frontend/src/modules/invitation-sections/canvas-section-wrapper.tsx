@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { ArrowUp, ArrowDown, Copy, Trash2, Settings2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { SectionFrame } from './components/section-frame';
 import type { SectionNode } from './types';
 
 interface CanvasSectionWrapperProps {
@@ -104,7 +105,9 @@ export const CanvasSectionWrapper: React.FC<CanvasSectionWrapperProps> = ({
         </div>
       )}
 
-      {children}
+      <SectionFrame styleConfig={section.style}>
+        {children}
+      </SectionFrame>
     </div>
   );
 };

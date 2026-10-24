@@ -135,6 +135,7 @@ export interface SectionNodeData {
   variant: string;
   isVisible: boolean;
   copy?: Record<string, unknown>;
+  style?: Record<string, unknown>;
 }
 
 export function mergeTemplateLayout(
@@ -166,6 +167,10 @@ export function mergeTemplateLayout(
       copy: {
         ...(tplSec.copy || {}),
         ...(existing?.copy || {}),
+      },
+      style: {
+        ...(tplSec.style || {}),
+        ...(existing?.style || {}),
       },
     };
   });

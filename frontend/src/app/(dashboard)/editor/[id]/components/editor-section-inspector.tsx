@@ -1,10 +1,26 @@
 'use client';
 
 import * as React from 'react';
-import { ChevronLeft, Sliders, Trash2, Layout, ArrowRight, FileText } from 'lucide-react';
+import {
+  ChevronLeft,
+  Sliders,
+  Trash2,
+  Layout,
+  ArrowRight,
+  FileText,
+  Image as ImageIcon,
+  Sparkles,
+  Layers,
+  X,
+  SlidersHorizontal,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useInvitationEditorStore } from '@/lib/stores/invitation-editor.store';
-import type { SectionType } from '@/modules/invitation-sections/types';
+import type {
+  SectionType,
+  FrameStyle,
+  SectionStyleConfig,
+} from '@/modules/invitation-sections/types';
 
 const SECTION_VARIANT_OPTIONS: Partial<
   Record<SectionType, { label: string; value: string; description: string }[]>
@@ -20,12 +36,22 @@ const SECTION_VARIANT_OPTIONS: Partial<
   ],
 };
 
+const FRAME_STYLE_OPTIONS: { label: string; value: FrameStyle; description: string }[] = [
+  { label: 'Polos', value: 'none', description: 'Sesuai warna dasar tema' },
+  { label: 'Garis Klasik', value: 'classic-border', description: 'Garis bingkai ganda elegan' },
+  { label: 'Sudut Bunga', value: 'floral-corners', description: 'Hiasan ornamen di 4 sudut' },
+  { label: 'Kartu Melayang', value: 'card-box', description: 'Kotak kartu dengan bayangan lembut' },
+  { label: 'Jendela Kubah', value: 'arch-window', description: 'Lengkungan klasik bagian atas' },
+];
+
 export const EditorSectionInspector: React.FC = () => {
+  const content = useInvitationEditorStore((s) => s.content);
   const sections = useInvitationEditorStore((s) => s.sections);
   const activeSectionId = useInvitationEditorStore((s) => s.activeSectionId);
   const setActiveTab = useInvitationEditorStore((s) => s.setActiveTab);
   const updateSectionCopy = useInvitationEditorStore((s) => s.updateSectionCopy);
   const updateSectionVariant = useInvitationEditorStore((s) => s.updateSectionVariant);
+  const updateSectionStyle = useInvitationEditorStore((s) => s.updateSectionStyle);
   const deleteSection = useInvitationEditorStore((s) => s.deleteSection);
 
   const activeSection = sections.find((s) => s.id === activeSectionId);
@@ -49,7 +75,24 @@ export const EditorSectionInspector: React.FC = () => {
   }
 
   const copy = (activeSection.copy || {}) as Record<string, unknown>;
+  const style = (activeSection.style || {}) as SectionStyleConfig;
   const availableVariants = SECTION_VARIANT_OPTIONS[activeSection.type];
+
+  // Shortcut foto dari mempelai & galeri
+  const availablePhotos: { label: string; url: string }[] = [];
+  if (content.couple?.groom?.photoUrl) {
+    availablePhotos.push({ label: 'Foto Pria', url: content.couple.groom.photoUrl });
+  }
+  if (content.couple?.bride?.photoUrl) {
+    availablePhotos.push({ label: 'Foto Wanita', url: content.couple.bride.photoUrl });
+  }
+  if (Array.isArray(content.gallery)) {
+    content.gallery.forEach((p, idx) => {
+      if (p?.url) {
+        availablePhotos.push({ label: `Galeri #${idx + 1}`, url: p.url });
+      }
+    });
+  }
 
   const handleCopyChange = (field: string, value: string) => {
     updateSectionCopy(activeSection.id, { [field]: value });
@@ -137,6 +180,154 @@ export const EditorSectionInspector: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Kustomisasi Latar Belakang & Bingkai Bagian */}
+      <div className="space-y-4 pt-3 border-t border-border" data-testid="inspector-style-section">
+        <div className="flex items-center justify-between">
+          <label className="font-semibold text-foreground flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-primary" />
+            <span>Latar Belakang & Bingkai</span>
+          </label>
+          {(style.backgroundImageUrl || (style.frameStyle && style.frameStyle !== 'none')) && (
+            <button
+              type="button"
+              onClick={() =>
+                updateSectionStyle(activeSection.id, {
+                  backgroundImageUrl: undefined,
+                  frameStyle: 'none',
+                })
+              }
+              className="text-[10px] text-muted-foreground hover:text-destructive flex items-center gap-1 transition-colors"
+            >
+              <X className="w-3 h-3" />
+              <span>Reset Gaya</span>
+            </button>
+          )}
+        </div>
+
+        {/* 1. Pilihan Gaya Bingkai / Ornamen */}
+        <div className="space-y-1.5">
+          <span className="text-[11px] font-medium text-muted-foreground block">
+            Gaya Bingkai & Ornamen
+          </span>
+          <div className="grid grid-cols-2 gap-1.5">
+            {FRAME_STYLE_OPTIONS.map((frameOpt) => {
+              const isSelected = (style.frameStyle || 'none') === frameOpt.value;
+              return (
+                <button
+                  key={frameOpt.value}
+                  type="button"
+                  data-testid={`inspector-frame-${frameOpt.value}`}
+                  onClick={() =>
+                    updateSectionStyle(activeSection.id, { frameStyle: frameOpt.value })
+                  }
+                  className={`p-2 rounded-lg border text-left transition-all ${
+                    isSelected
+                      ? 'border-primary ring-1 ring-primary bg-primary/10 text-foreground font-semibold'
+                      : 'border-border bg-card/60 hover:border-primary/40 text-muted-foreground'
+                  }`}
+                >
+                  <p className="text-[11px] font-medium">{frameOpt.label}</p>
+                  <p className="text-[9px] text-muted-caption truncate">{frameOpt.description}</p>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 2. Pilihan Foto Latar Bagian */}
+        <div className="space-y-2 pt-1">
+          <span className="text-[11px] font-medium text-muted-foreground block">
+            Foto Latar Bagian (Backdrop)
+          </span>
+
+          {/* Quick-Pick Chips from Groom / Bride / Gallery */}
+          {availablePhotos.length > 0 && (
+            <div className="space-y-1">
+              <span className="text-[10px] text-muted-caption">Pilih Cepat dari Data Mempelai:</span>
+              <div className="flex flex-wrap gap-1.5">
+                {availablePhotos.map((photo, pIdx) => {
+                  const isCurrent = style.backgroundImageUrl === photo.url;
+                  return (
+                    <button
+                      key={pIdx}
+                      type="button"
+                      onClick={() =>
+                        updateSectionStyle(activeSection.id, { backgroundImageUrl: photo.url })
+                      }
+                      className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[10px] border transition-all ${
+                        isCurrent
+                          ? 'border-primary bg-primary text-white font-semibold'
+                          : 'border-border bg-card hover:border-primary/50 text-foreground'
+                      }`}
+                    >
+                      <ImageIcon className="w-2.5 h-2.5" />
+                      <span>{photo.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Manual URL Input */}
+          <div className="relative">
+            <input
+              type="text"
+              value={style.backgroundImageUrl || ''}
+              onChange={(e) =>
+                updateSectionStyle(activeSection.id, {
+                  backgroundImageUrl: e.target.value.trim() || undefined,
+                })
+              }
+              placeholder="Atau tempel URL foto (https://...)"
+              className="w-full rounded-md border border-input bg-background px-3 py-1.5 text-[11px] focus:outline-none focus:ring-1 focus:ring-ring pr-7"
+            />
+            {style.backgroundImageUrl && (
+              <button
+                type="button"
+                onClick={() =>
+                  updateSectionStyle(activeSection.id, { backgroundImageUrl: undefined })
+                }
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* 3. Slider Kegelapan Overlay (hanya jika ada foto latar) */}
+        {style.backgroundImageUrl && (
+          <div className="p-2.5 rounded-xl border border-border/80 bg-muted/30 space-y-2">
+            <div className="flex items-center justify-between text-[11px]">
+              <span className="font-medium text-foreground flex items-center gap-1">
+                <SlidersHorizontal className="w-3 h-3 text-primary" />
+                <span>Kegelapan Lapisan Foto (Overlay)</span>
+              </span>
+              <span className="font-mono font-semibold text-primary">
+                {style.backgroundOverlayOpacity ?? 40}%
+              </span>
+            </div>
+            <input
+              type="range"
+              min={0}
+              max={90}
+              step={5}
+              value={style.backgroundOverlayOpacity ?? 40}
+              onChange={(e) =>
+                updateSectionStyle(activeSection.id, {
+                  backgroundOverlayOpacity: Number(e.target.value),
+                })
+              }
+              className="w-full accent-primary cursor-pointer h-1.5 bg-border rounded-lg"
+            />
+            <p className="text-[10px] text-muted-caption leading-tight">
+              Tingkatkan kegelapan agar tulisan undangan di atas foto tetap kontras dan nyaman dibaca.
+            </p>
+          </div>
+        )}
+      </div>
 
       {/* Kustomisasi Teks Kontekstual Bagian (Copy) */}
       <div className="space-y-3 pt-2 border-t border-border">

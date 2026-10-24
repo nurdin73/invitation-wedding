@@ -5,6 +5,7 @@ import type { InvitationData } from '@/services/api/invitations.api';
 import type { SectionNode, InvitationContent } from '@/modules/invitation-sections/types';
 import { generateCanvasStyleVars } from '@/lib/style-helpers';
 import { resolveSectionComponent } from '@/modules/invitation-sections/registry';
+import { SectionFrame } from '@/modules/invitation-sections/components/section-frame';
 import { CoverGateOverlay } from '@/modules/invitation-sections/cover-gate-overlay';
 import { InvitationAudioPlayer } from '@/modules/invitation-sections/invitation-audio-player';
 import { getCoupleDisplayNames } from '@/modules/invitation-sections/content-format.utils';
@@ -70,15 +71,18 @@ export const PublicInvitationContainer: React.FC<PublicInvitationContainerProps>
           visibleSections.map((sec) => {
             const Component = resolveSectionComponent(sec.type, sec.variant);
             return (
-              <Component
-                key={sec.id}
-                id={sec.id}
-                content={content}
-                copy={sec.copy}
-                variant={sec.variant}
-                themeConfig={invitation.themeConfig}
-                isEditor={false}
-              />
+              <SectionFrame key={sec.id} styleConfig={sec.style}>
+                <Component
+                  id={sec.id}
+                  content={content}
+                  copy={sec.copy}
+                  variant={sec.variant}
+                  themeConfig={invitation.themeConfig}
+                  isEditor={false}
+                  style={sec.style}
+                  invitationId={invitation.id}
+                />
+              </SectionFrame>
             );
           })
         )}

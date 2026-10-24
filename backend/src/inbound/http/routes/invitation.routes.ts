@@ -1,9 +1,11 @@
 import { Elysia, t } from 'elysia';
 import { registry } from '../../../configs/registry';
 import { InvitationController } from '../controllers/invitation.controller';
+import { RsvpController } from '../controllers/rsvp.controller';
 import { authMacro } from '../middlewares/auth.macro';
 
 const controller = new InvitationController(registry.invitationService);
+const rsvpController = new RsvpController(registry.rsvpService);
 
 export const invitationRoutes = new Elysia({ prefix: '/invitations' })
   .use(authMacro)
@@ -18,6 +20,45 @@ export const invitationRoutes = new Elysia({ prefix: '/invitations' })
       detail: {
         tags: ['Invitations Public'],
         summary: 'Mengambil data undangan publik berdasarkan slug',
+      },
+    }
+  )
+  // Public route: ambil daftar ucapan & konfirmasi kehadiran undangan
+  .get(
+    '/:id/rsvps',
+    async ({ params }) => {
+      return await rsvpController.getRsvps(params.id);
+    },
+    {
+      params: t.Object({ id: t.String() }),
+      detail: {
+        tags: ['RSVP Public'],
+        summary: 'Mengambil daftar doa restu dan rekapitulasi kehadiran tamu',
+      },
+    }
+  )
+  // Public route: kirim konfirmasi kehadiran dan ucapan dari tamu
+  .post(
+    '/:id/rsvps',
+    async ({ params, body }) => {
+      return await rsvpController.submitRsvp(params.id, {
+        guestName: body.guestName,
+        attendanceStatus: body.attendanceStatus as 'attending' | 'not_attending',
+        guestCount: body.guestCount,
+        message: body.message,
+      });
+    },
+    {
+      params: t.Object({ id: t.String() }),
+      body: t.Object({
+        guestName: t.String({ minLength: 1 }),
+        attendanceStatus: t.Union([t.Literal('attending'), t.Literal('not_attending')]),
+        guestCount: t.Optional(t.Integer({ minimum: 1, maximum: 10 })),
+        message: t.Optional(t.String()),
+      }),
+      detail: {
+        tags: ['RSVP Public'],
+        summary: 'Mengirim konfirmasi kehadiran dan ucapan doa restu tamu undangan',
       },
     }
   )
