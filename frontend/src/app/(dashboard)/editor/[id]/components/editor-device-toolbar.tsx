@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Smartphone, Tablet, Monitor, Eye, EyeOff } from 'lucide-react';
+import { Smartphone, Tablet, Laptop, Eye, EyeOff } from 'lucide-react';
 import { useInvitationEditorStore, type ViewportMode } from '@/lib/stores/invitation-editor.store';
 import { cn } from '@/lib/utils';
 
@@ -17,37 +17,38 @@ export const EditorDeviceToolbar: React.FC<EditorDeviceToolbarProps> = ({
   const viewportMode = useInvitationEditorStore((s) => s.viewportMode);
   const setViewportMode = useInvitationEditorStore((s) => s.setViewportMode);
 
-  const devices: { mode: ViewportMode; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
-    { mode: 'mobile', label: 'Ponsel (390px)', icon: Smartphone },
-    { mode: 'tablet', label: 'Tablet (640px)', icon: Tablet },
-    { mode: 'full', label: 'Layar Penuh', icon: Monitor },
+  const devices: { mode: ViewportMode; label: string; widthLabel: string; icon: React.ComponentType<{ className?: string }> }[] = [
+    { mode: 'mobile', label: 'Ponsel', widthLabel: '390px', icon: Smartphone },
+    { mode: 'tablet', label: 'Tablet', widthLabel: '768px', icon: Tablet },
+    { mode: 'laptop', label: 'Laptop', widthLabel: '1024px', icon: Laptop },
   ];
 
   return (
     <div
-      className="flex items-center gap-1.5 bg-card/95 backdrop-blur-xs border border-border rounded-xl p-1 shadow-md"
+      className="flex items-center gap-1.5 bg-muted/60 dark:bg-muted/30 border border-border rounded-xl p-1 shadow-2xs"
       data-testid="editor-device-toolbar"
     >
       <div className="flex items-center gap-1">
         {devices.map((d) => {
           const Icon = d.icon;
-          const isActive = viewportMode === d.mode;
+          const isActive = viewportMode === d.mode || (d.mode === 'laptop' && viewportMode === 'full');
           return (
             <button
               key={d.mode}
               type="button"
-              title={d.label}
+              title={`${d.label} (${d.widthLabel})`}
               onClick={() => setViewportMode(d.mode)}
               className={cn(
-                'flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors',
+                'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150',
                 isActive
-                  ? 'bg-primary text-primary-foreground shadow-2xs'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                  ? 'bg-primary text-primary-foreground shadow-2xs font-semibold'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-card/80'
               )}
               data-testid={`device-btn-${d.mode}`}
             >
               <Icon className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline text-[11px]">{d.label}</span>
+              <span className="text-[11px] font-medium">{d.label}</span>
+              <span className="hidden md:inline text-[9px] opacity-70 font-mono">({d.widthLabel})</span>
             </button>
           );
         })}

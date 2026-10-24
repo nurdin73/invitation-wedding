@@ -26,7 +26,7 @@ export default async function GuestPage({ params, searchParams }: GuestPageProps
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 flex justify-center selection:bg-rose-500 selection:text-white">
+    <div className="min-h-screen w-full bg-background selection:bg-rose-500 selection:text-white">
       <PublicInvitationContainer
         invitation={invitation}
         guestName={guestName}

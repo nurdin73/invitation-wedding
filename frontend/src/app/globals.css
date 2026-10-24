@@ -106,3 +106,36 @@ h3, h4, h5, h6 {
   font-family: var(--font-sans), 'Plus Jakarta Sans', sans-serif;
 }
 
+/* ─── INVITATION VIEWPORT-AWARE RESPONSIVE GRIDS ────────────────────────── */
+.inv-grid-2-cols {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+/* Strict Mobile Isolation in Editor: Never allow desktop screen width to trigger 2 columns */
+[data-viewport="mobile"] .inv-grid-2-cols {
+  grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+}
+
+/* Tablet & Laptop in Editor */
+[data-viewport="tablet"] .inv-grid-2-cols,
+[data-viewport="laptop"] .inv-grid-2-cols,
+[data-viewport="full"] .inv-grid-2-cols {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+/* Container Queries for Public Guest View & Resizable Canvas */
+@container (min-width: 680px) {
+  :not([data-viewport="mobile"]) .inv-grid-2-cols {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Fallback Media Query for Public Guest View */
+@media (min-width: 768px) {
+  :not([data-viewport="mobile"]) .inv-grid-2-cols {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+

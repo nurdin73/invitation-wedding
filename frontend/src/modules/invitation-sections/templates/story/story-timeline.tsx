@@ -25,15 +25,15 @@ export const StoryTimeline: React.FC<SectionRenderProps<'story'>> = ({
   return (
     <section
       data-testid="section-story-timeline"
-      className="relative w-full py-16 px-6 text-center space-y-6 flex flex-col justify-center items-center min-h-[60vh]"
+      className="relative w-full py-12 sm:py-20 md:py-24 px-4 sm:px-6 text-center space-y-6 sm:space-y-8 flex flex-col justify-center items-center"
       style={{
         backgroundColor: 'var(--inv-bg, #FAF8F5)',
         color: 'var(--inv-font-body, #3A302C)',
       }}
     >
-      <div className="space-y-1">
+      <div className="space-y-2 max-w-sm sm:max-w-xl mx-auto">
         <h2
-          className="text-2xl font-normal"
+          className="text-2xl sm:text-3xl md:text-4xl font-normal tracking-tight"
           style={{
             fontFamily: 'var(--inv-font-heading, "Playfair Display", serif)',
             color: 'var(--inv-primary, #B86B70)',
@@ -41,41 +41,42 @@ export const StoryTimeline: React.FC<SectionRenderProps<'story'>> = ({
         >
           {copy?.title || 'Kisah Cinta Kami (Love Story)'}
         </h2>
-        <p className="text-xs opacity-70 max-w-sm mx-auto">
+        <p className="text-xs sm:text-sm opacity-75 max-w-xs sm:max-w-md mx-auto leading-relaxed">
           {copy?.subtitle || 'Perjalanan indah hingga kami berlabuh di pelaminan'}
         </p>
+        <div className="w-16 h-px bg-gradient-to-r from-transparent via-[var(--inv-primary)]/40 to-transparent mx-auto pt-2" />
       </div>
 
-      <div className="max-w-sm mx-auto pt-4 relative text-left w-full">
+      <div className="max-w-sm sm:max-w-xl md:max-w-2xl mx-auto pt-4 sm:pt-6 relative text-left w-full">
         {/* Central Vertical Timeline Guide */}
-        <div className="absolute top-4 bottom-4 left-4 w-0.5 bg-current/15 -translate-x-1/2" />
+        <div className="absolute top-6 bottom-6 left-5 sm:left-6 w-0.5 bg-gradient-to-b from-transparent via-[var(--inv-primary)]/30 to-transparent -translate-x-1/2" />
 
-        <div className="space-y-6 pl-8">
+        <div className="space-y-4 sm:space-y-8 pl-10 sm:pl-12">
           {stories.map((item: StoryTimelineItem, index: number) => (
             <div key={item.id || index} className="relative group">
               {/* Bullet Node on Timeline */}
               <div
-                className="absolute -left-8 top-1 -translate-x-1/2 w-5 h-5 rounded-full border-2 border-background flex items-center justify-center text-white shadow-xs"
+                className="absolute -left-10 sm:-left-12 top-2 -translate-x-1/2 w-6 sm:w-7 h-6 sm:h-7 rounded-full border-2 border-background flex items-center justify-center text-white shadow-md transition-transform duration-300 group-hover:scale-110"
                 style={{ backgroundColor: 'var(--inv-primary, #B86B70)' }}
               >
-                <Heart className="w-2.5 h-2.5 fill-current" />
+                <Heart className="w-3 h-3 fill-current" />
               </div>
 
               {/* Story Content Card */}
-              <div className="p-4 rounded-xl border border-current/10 bg-current/[0.02] space-y-1.5 transition-all group-hover:border-[var(--inv-primary)]/40">
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-bold tracking-wider text-[var(--inv-primary)] font-mono uppercase">
+              <div className="p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-[var(--inv-primary)]/20 bg-white/70 dark:bg-black/30 backdrop-blur-md space-y-2 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_16px_40px_rgb(0,0,0,0.08)] hover:border-[var(--inv-primary)]/40 transition-all duration-300">
+                <div className="flex items-center justify-between border-b border-current/10 pb-2">
+                  <span className="text-xs sm:text-sm font-bold tracking-[0.2em] text-[var(--inv-primary)] font-mono uppercase">
                     {item.year}
                   </span>
-                  <Sparkles className="w-3 h-3 text-[var(--inv-primary)] opacity-60" />
+                  <Sparkles className="w-3.5 h-3.5 text-[var(--inv-primary)] opacity-70" />
                 </div>
                 <h3
-                  className="font-semibold text-sm text-foreground"
+                  className="font-medium text-base sm:text-lg text-foreground tracking-tight"
                   style={{ fontFamily: 'var(--inv-font-heading, "Playfair Display", serif)' }}
                 >
                   {item.title}
                 </h3>
-                <p className="text-xs opacity-75 leading-relaxed">
+                <p className="text-xs sm:text-sm opacity-80 leading-relaxed">
                   {item.story}
                 </p>
               </div>

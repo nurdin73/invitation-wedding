@@ -50,7 +50,7 @@ export const CanvasSectionWrapper: React.FC<CanvasSectionWrapperProps> = ({
         <div
           data-testid={`canvas-section-toolbar-${section.id}`}
           onClick={(e) => e.stopPropagation()}
-          className="absolute -top-3.5 right-4 z-30 flex items-center gap-0.5 bg-primary text-primary-foreground px-2 py-0.5 rounded-full shadow-lg text-[10px] font-medium"
+          className="absolute top-2 right-3 z-30 flex items-center gap-0.5 bg-primary text-primary-foreground px-2.5 py-1 rounded-full shadow-xl text-[10px] font-medium"
         >
           <span className="uppercase tracking-wider mr-1.5 opacity-90 font-mono">
             {section.type}

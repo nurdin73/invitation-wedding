@@ -4,6 +4,7 @@ import * as React from 'react';
 import { Layers, Palette, FileText } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useInvitationEditorStore, type EditorTab } from '@/lib/stores/invitation-editor.store';
+import { cn } from '@/lib/utils';
 import { EditorSectionsList } from './editor-sections-list';
 import { EditorSectionInspector } from './editor-section-inspector';
 import { EditorThemeSettings } from './editor-theme-settings';
@@ -14,6 +15,7 @@ export const EditorLeftPanel: React.FC = () => {
   const activeTab = useInvitationEditorStore((s) => s.activeTab);
   const setActiveTab = useInvitationEditorStore((s) => s.setActiveTab);
   const activeSectionId = useInvitationEditorStore((s) => s.activeSectionId);
+  const isLeftPanelCollapsed = useInvitationEditorStore((s) => s.isLeftPanelCollapsed);
   const [isAddModalOpen, setIsAddModalOpen] = React.useState(false);
 
   // Jika sedang di tab inspector, highlight tab sections pada navigation bar
@@ -21,7 +23,12 @@ export const EditorLeftPanel: React.FC = () => {
 
   return (
     <aside
-      className="w-full lg:w-96 shrink-0 border-r border-border bg-card flex flex-col h-full overflow-hidden"
+      className={cn(
+        'shrink-0 border-r border-border bg-card flex flex-col h-full overflow-hidden transition-all duration-300 ease-in-out',
+        isLeftPanelCollapsed
+          ? 'w-0 opacity-0 pointer-events-none border-r-0'
+          : 'w-full lg:w-96 opacity-100'
+      )}
       data-testid="editor-left-panel"
     >
       {/* Tab Switcher */}

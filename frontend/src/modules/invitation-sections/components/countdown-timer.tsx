@@ -80,20 +80,20 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({ targetDate }) =>
   return (
     <div
       data-testid="countdown-timer"
-      className="grid grid-cols-4 gap-2 max-w-[280px] mx-auto pt-4"
+      className="grid grid-cols-4 gap-2.5 sm:gap-4 max-w-xs sm:max-w-md mx-auto pt-6"
     >
       {units.map((u) => (
         <div
           key={u.label}
-          className="p-2 rounded-xl border border-current/15 bg-current/[0.03] backdrop-blur-xs flex flex-col items-center justify-center shadow-2xs"
+          className="p-3 sm:p-4 rounded-2xl border border-[var(--inv-primary)]/20 bg-white/60 dark:bg-black/30 backdrop-blur-md flex flex-col items-center justify-center shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:border-[var(--inv-primary)]/40 transition-all"
         >
           <span
-            className="text-base sm:text-lg font-bold font-mono leading-none"
+            className="text-lg sm:text-2xl md:text-3xl font-semibold font-mono leading-none tracking-tight"
             style={{ color: 'var(--inv-primary, #B86B70)' }}
           >
             {String(u.value).padStart(2, '0')}
           </span>
-          <span className="text-[9px] uppercase tracking-wider opacity-70 font-medium mt-1">
+          <span className="text-[9px] sm:text-[11px] uppercase tracking-[0.2em] opacity-75 font-medium mt-1.5">
             {u.label}
           </span>
         </div>

@@ -40,7 +40,7 @@ export const PublicInvitationContainer: React.FC<PublicInvitationContainerProps>
   return (
     <div
       className={cn(
-        'w-full max-w-md bg-background shadow-2xl relative flex flex-col',
+        'w-full min-h-screen bg-background relative flex flex-col',
         !isCoverOpen ? 'h-[100dvh] max-h-[100dvh] overflow-hidden' : 'min-h-screen overflow-y-auto'
       )}
       data-testid="public-invitation-container"
@@ -60,7 +60,8 @@ export const PublicInvitationContainer: React.FC<PublicInvitationContainerProps>
       {/* Main Rangkaian Konten Undangan (Scrollable setelah dibuka) */}
       <main
         style={canvasStyle}
-        className="min-h-screen flex flex-col font-sans"
+        data-viewport="auto"
+        className="min-h-screen w-full flex flex-col font-sans @container"
         data-testid="guest-invitation-view"
       >
         {visibleSections.length === 0 ? (

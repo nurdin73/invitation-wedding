@@ -13,7 +13,7 @@ import type {
 } from '@/modules/invitation-sections/types';
 
 export type EditorTab = 'content' | 'design' | 'sections' | 'inspector';
-export type ViewportMode = 'mobile' | 'tablet' | 'full';
+export type ViewportMode = 'mobile' | 'tablet' | 'laptop' | 'full';
 
 interface EditorState {
   invitation: InvitationData | null;
@@ -23,6 +23,7 @@ interface EditorState {
   activeSectionId: string | null;
   activeTab: EditorTab;
   viewportMode: ViewportMode;
+  isLeftPanelCollapsed: boolean;
   isDirty: boolean;
   isSaving: boolean;
   isPublishing: boolean;
@@ -32,6 +33,8 @@ interface EditorState {
   setActiveSection: (id: string | null) => void;
   setActiveTab: (tab: EditorTab) => void;
   setViewportMode: (mode: ViewportMode) => void;
+  toggleLeftPanel: () => void;
+  setLeftPanelCollapsed: (collapsed: boolean) => void;
 
   // Content actions
   updateContent: (patch: Partial<InvitationContent>) => void;
@@ -185,6 +188,7 @@ export const useInvitationEditorStore = create<EditorState>((set, get) => ({
   activeSectionId: null,
   activeTab: 'content',
   viewportMode: 'mobile',
+  isLeftPanelCollapsed: false,
   isDirty: false,
   isSaving: false,
   isPublishing: false,
@@ -248,6 +252,14 @@ export const useInvitationEditorStore = create<EditorState>((set, get) => ({
 
   setViewportMode: (viewportMode: ViewportMode) => {
     set({ viewportMode });
+  },
+
+  toggleLeftPanel: () => {
+    set((state) => ({ isLeftPanelCollapsed: !state.isLeftPanelCollapsed }));
+  },
+
+  setLeftPanelCollapsed: (isLeftPanelCollapsed: boolean) => {
+    set({ isLeftPanelCollapsed });
   },
 
   // Content Handlers
