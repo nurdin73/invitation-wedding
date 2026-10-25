@@ -68,7 +68,8 @@ export class Registry {
     this.billingService = new BillingServiceImplement(
       this.orderRepository,
       this.paymentGateway,
-      this.userRepository
+      this.userRepository,
+      this.invitationRepository
     );
 
     this.authService = new AuthServiceImplement(

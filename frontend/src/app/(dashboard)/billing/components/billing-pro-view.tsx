@@ -19,7 +19,7 @@ interface BillingProViewProps {
 }
 
 function formatDate(isoString: string | null): string {
-  if (!isoString) return '1 Tahun Sejak Aktivasi';
+  if (!isoString) return 'H+30 Hari Pasca Resepsi';
   try {
     const date = new Date(isoString);
     return new Intl.DateTimeFormat('id-ID', {
@@ -91,7 +91,7 @@ export function BillingProView({ subInfo }: BillingProViewProps) {
                 <Crown className="h-3.5 w-3.5" />
                 Paket PRO Aktif
               </Badge>
-              <span className="text-xs text-muted-foreground font-medium">Pembayaran Sekali (Tanpa Tagihan Berulang)</span>
+              <span className="text-xs text-muted-foreground font-medium">Pembayaran Sekali (Aktif s.d. H+30 Resepsi)</span>
             </div>
 
             <h2 className="text-2xl font-semibold tracking-tight text-foreground font-heading">
@@ -105,17 +105,27 @@ export function BillingProView({ subInfo }: BillingProViewProps) {
 
             <div className="pt-2 flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
               <div className="inline-flex items-center gap-1.5">
-                <Calendar className="h-4 w-4 text-primary" />
-                <span>Masa Aktif Hosting Undangan: <strong className="text-foreground">{formatDate(subInfo.expiresAt)}</strong> (1 Tahun)</span>
+                <Calendar className="h-4 w-4 text-primary shrink-0" />
+                <span>
+                  Masa Aktif Hosting Undangan:{' '}
+                  {subInfo.expiresAt ? (
+                    <>
+                      s.d. <strong className="text-foreground">{formatDate(subInfo.expiresAt)}</strong>{' '}
+                      <span className="text-muted-caption">(H+30 Hari Resepsi)</span>
+                    </>
+                  ) : (
+                    <strong className="text-foreground">Aktif s.d. 30 hari pasca resepsi</strong>
+                  )}
+                </span>
               </div>
               <div className="inline-flex items-center gap-1.5">
-                <ShieldCheck className="h-4 w-4 text-success-foreground" />
+                <ShieldCheck className="h-4 w-4 text-success-foreground shrink-0" />
                 <span>Terverifikasi Otomatis (Midtrans)</span>
               </div>
             </div>
 
             <p className="text-xs text-muted-caption pt-0.5">
-              *Website undangan Anda aktif melayani tamu hingga tanggal di atas tanpa biaya perpanjangan otomatis.
+              *Website undangan Anda aktif melayani tamu hingga 1 bulan (30 hari) setelah tanggal resepsi pernikahan selesai tanpa biaya perpanjangan otomatis.
             </p>
           </div>
 

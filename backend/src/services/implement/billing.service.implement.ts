@@ -3,6 +3,7 @@ import { META_CODES } from '../../constants/meta-codes';
 import type { IOrderRepository } from '../../outbound/order-repository.port';
 import type { IPaymentGatewayPort } from '../../outbound/payment-gateway.port';
 import type { IUserRepository } from '../../outbound/user-repository.port';
+import type { IInvitationRepository } from '../../outbound/invitation-repository.port';
 import type { CheckoutResult, IBillingService, SubscriptionStatus } from '../billing.service';
 
 const PLAN_PRICES: Record<string, number> = {
@@ -13,7 +14,8 @@ export class BillingServiceImplement implements IBillingService {
   constructor(
     private readonly orderRepo: IOrderRepository,
     private readonly paymentGateway: IPaymentGatewayPort,
-    private readonly userRepo: IUserRepository
+    private readonly userRepo: IUserRepository,
+    private readonly invitationRepo?: IInvitationRepository
   ) {}
 
   async checkoutSubscription(userId: string, plan: string): Promise<CheckoutResult> {
@@ -108,11 +110,39 @@ export class BillingServiceImplement implements IBillingService {
 
     const plan = (activeOrder.metadata?.plan as string) || 'PRO';
 
+    let expiresAt: Date | null = null;
+    if (this.invitationRepo) {
+      const published = await this.invitationRepo.findPublishedByUserId(userId);
+      const userInvitations = published ? [published] : await this.invitationRepo.findByUserId(userId);
+      const targetInvitation = published ?? userInvitations[0];
+
+      if (targetInvitation && targetInvitation.content) {
+        const events =
+          (targetInvitation.content.events as Array<{ id?: string; eventName?: string; date?: string }>) || [];
+        const resepsiEvent =
+          events.find(
+            (e) =>
+              e.id === 'event-resepsi' ||
+              (typeof e.eventName === 'string' && e.eventName.toLowerCase().includes('resepsi'))
+          ) ?? events[events.length - 1];
+
+        if (resepsiEvent?.date && resepsiEvent.date.trim() !== '') {
+          const parsedDate = new Date(resepsiEvent.date);
+          if (!isNaN(parsedDate.getTime())) {
+            // 30 hari (1 bulan) setelah tanggal resepsi
+            expiresAt = new Date(parsedDate.getTime() + 30 * 24 * 60 * 60 * 1000);
+          }
+        }
+      }
+    }
+
+    const isSubscriberActive = expiresAt ? new Date() <= expiresAt : true;
+
     return {
       plan,
-      status: 'ACTIVE',
-      isSubscriberActive: true,
-      expiresAt: new Date(activeOrder.updatedAt.getTime() + 365 * 24 * 60 * 60 * 1000), // 1 tahun masa aktif sejak pembayaran
+      status: isSubscriberActive ? 'ACTIVE' : 'EXPIRED',
+      isSubscriberActive,
+      expiresAt,
       latestOrder: {
         orderNumber: activeOrder.orderNumber,
         amount: activeOrder.amount,
