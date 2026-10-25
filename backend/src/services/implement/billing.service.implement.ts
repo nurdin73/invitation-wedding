@@ -102,6 +102,7 @@ export class BillingServiceImplement implements IBillingService {
         status: 'ACTIVE',
         isSubscriberActive: false,
         expiresAt: null,
+        latestOrder: null,
       };
     }
 
@@ -111,7 +112,14 @@ export class BillingServiceImplement implements IBillingService {
       plan,
       status: 'ACTIVE',
       isSubscriberActive: true,
-      expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 tahun masa aktif
+      expiresAt: new Date(activeOrder.updatedAt.getTime() + 365 * 24 * 60 * 60 * 1000), // 1 tahun masa aktif sejak pembayaran
+      latestOrder: {
+        orderNumber: activeOrder.orderNumber,
+        amount: activeOrder.amount,
+        paymentType: activeOrder.paymentType,
+        createdAt: activeOrder.createdAt,
+        updatedAt: activeOrder.updatedAt,
+      },
     };
   }
 }

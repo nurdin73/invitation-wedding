@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { eq, desc } from 'drizzle-orm';
 import { db } from '../../db';
 import { orders } from '../../db/schema/orders.schema';
 import type { IOrderRepository, OrderRecord } from '../order-repository.port';
@@ -17,7 +17,11 @@ export class DrizzleOrderRepository implements IOrderRepository {
   }
 
   async findByUserId(userId: string): Promise<OrderRecord[]> {
-    const results = await db.select().from(orders).where(eq(orders.userId, userId));
+    const results = await db
+      .select()
+      .from(orders)
+      .where(eq(orders.userId, userId))
+      .orderBy(desc(orders.createdAt));
     return results.map((r) => this.mapToRecord(r));
   }
 

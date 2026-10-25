@@ -57,6 +57,11 @@ export class MidtransPaymentAdapter implements IPaymentGatewayPort {
         first_name: payload.customer.fullName,
         email: payload.customer.email,
       },
+      callbacks: {
+        finish: `${env.FRONTEND_URL}/billing`,
+        unfinish: `${env.FRONTEND_URL}/billing`,
+        error: `${env.FRONTEND_URL}/billing`,
+      },
     };
 
     const response = await this.snapClient.createTransaction(parameter);

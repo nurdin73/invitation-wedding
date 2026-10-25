@@ -6,11 +6,20 @@ export interface CheckoutSession {
   redirectUrl: string;
 }
 
+export interface SubscriptionOrder {
+  orderNumber: string;
+  amount: number;
+  paymentType: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface SubscriptionInfo {
   plan: string;
   status: string;
   isSubscriberActive: boolean;
   expiresAt: string | null;
+  latestOrder?: SubscriptionOrder | null;
 }
 
 export const billingApi = {

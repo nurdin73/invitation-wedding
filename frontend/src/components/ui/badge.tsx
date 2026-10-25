@@ -12,7 +12,7 @@ export const badgeVariants = cva(
         destructive: 'border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80',
         outline: 'text-foreground border-border',
         accent: 'border-accent/20 bg-accent/10 text-accent',
-        success: 'border-success/20 bg-success/10 text-success',
+        success: 'border border-success-foreground/20 bg-success text-success-foreground font-semibold shadow-xs',
       },
     },
     defaultVariants: {
