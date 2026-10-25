@@ -57,7 +57,7 @@ export function BillingFreeView({
               Rp 49.000
             </div>
             <span className="text-xs text-muted-caption">
-              sekali bayar per acara
+              sekali bayar per acara • aktif 1 tahun
             </span>
           </div>
         </div>
@@ -71,7 +71,7 @@ export function BillingFreeView({
           <div className="flex items-center gap-2 text-xs text-muted-caption">
             <ShieldCheck className="h-4 w-4 text-primary shrink-0" />
             <span>
-              Pembayaran otomatis diverifikasi via Snap Midtrans (QRIS, GoPay, ShopeePay, Virtual Account, & Kartu Kredit).
+              Pembayaran sekali bayar tanpa langganan otomatis via Snap Midtrans (QRIS, GoPay, ShopeePay, Virtual Account, & Kartu Kredit).
             </span>
           </div>
           <Button

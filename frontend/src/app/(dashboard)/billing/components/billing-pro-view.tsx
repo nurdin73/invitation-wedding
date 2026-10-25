@@ -91,7 +91,7 @@ export function BillingProView({ subInfo }: BillingProViewProps) {
                 <Crown className="h-3.5 w-3.5" />
                 Paket PRO Aktif
               </Badge>
-              <span className="text-xs text-muted-foreground font-medium">Sekali Bayar (Lifetime Acara)</span>
+              <span className="text-xs text-muted-foreground font-medium">Pembayaran Sekali (Tanpa Tagihan Berulang)</span>
             </div>
 
             <h2 className="text-2xl font-semibold tracking-tight text-foreground font-heading">
@@ -106,13 +106,17 @@ export function BillingProView({ subInfo }: BillingProViewProps) {
             <div className="pt-2 flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
               <div className="inline-flex items-center gap-1.5">
                 <Calendar className="h-4 w-4 text-primary" />
-                <span>Berlaku hingga: <strong className="text-foreground">{formatDate(subInfo.expiresAt)}</strong></span>
+                <span>Masa Aktif Hosting Undangan: <strong className="text-foreground">{formatDate(subInfo.expiresAt)}</strong> (1 Tahun)</span>
               </div>
               <div className="inline-flex items-center gap-1.5">
                 <ShieldCheck className="h-4 w-4 text-success-foreground" />
                 <span>Terverifikasi Otomatis (Midtrans)</span>
               </div>
             </div>
+
+            <p className="text-xs text-muted-caption pt-0.5">
+              *Website undangan Anda aktif melayani tamu hingga tanggal di atas tanpa biaya perpanjangan otomatis.
+            </p>
           </div>
 
           <div className="shrink-0 flex flex-col sm:flex-row md:flex-col gap-2.5">
