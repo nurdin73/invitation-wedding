@@ -6,7 +6,6 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useInvitationEditorStore, type EditorTab } from '@/lib/stores/invitation-editor.store';
 import { cn } from '@/lib/utils';
 import { EditorSectionsList } from './editor-sections-list';
-import { EditorSectionInspector } from './editor-section-inspector';
 import { EditorThemeSettings } from './editor-theme-settings';
 import { EditorAddSectionModal } from './editor-add-section-modal';
 import { ContentPanel } from './content/content-panel';
@@ -18,7 +17,6 @@ export const EditorLeftPanel: React.FC = () => {
   const isLeftPanelCollapsed = useInvitationEditorStore((s) => s.isLeftPanelCollapsed);
   const [isAddModalOpen, setIsAddModalOpen] = React.useState(false);
 
-  // Jika sedang di tab inspector, highlight tab sections pada navigation bar
   const currentTabValue = activeTab === 'inspector' ? 'sections' : activeTab;
 
   return (
@@ -27,7 +25,7 @@ export const EditorLeftPanel: React.FC = () => {
         'shrink-0 border-r border-border bg-card flex flex-col h-full overflow-hidden transition-all duration-300 ease-in-out',
         isLeftPanelCollapsed
           ? 'w-0 opacity-0 pointer-events-none border-r-0'
-          : 'w-full lg:w-96 opacity-100'
+          : 'w-full lg:w-80 xl:w-96 opacity-100'
       )}
       data-testid="editor-left-panel"
     >
@@ -72,15 +70,13 @@ export const EditorLeftPanel: React.FC = () => {
 
       {/* Tab Contents Area */}
       <div className="flex-1 overflow-y-auto p-4">
-        {activeTab === 'content' && <ContentPanel />}
+        {currentTabValue === 'content' && <ContentPanel />}
 
-        {activeTab === 'design' && <EditorThemeSettings />}
+        {currentTabValue === 'design' && <EditorThemeSettings />}
 
-        {activeTab === 'sections' && (
+        {currentTabValue === 'sections' && (
           <EditorSectionsList onOpenAddModal={() => setIsAddModalOpen(true)} />
         )}
-
-        {activeTab === 'inspector' && <EditorSectionInspector />}
       </div>
 
       {/* Section Library Picker Modal */}

@@ -39,7 +39,7 @@ export const CanvasSectionWrapper: React.FC<CanvasSectionWrapperProps> = ({
         onSelect(section.id);
       }}
       className={cn(
-        'relative group cursor-pointer transition-all duration-150',
+        'relative group cursor-pointer transition-all duration-150 min-h-[100dvh] min-h-screen flex flex-col',
         isSelected
           ? 'ring-2 ring-primary ring-offset-2 z-20'
           : 'hover:outline-1 hover:outline-dashed hover:outline-primary/50'
@@ -105,7 +105,7 @@ export const CanvasSectionWrapper: React.FC<CanvasSectionWrapperProps> = ({
         </div>
       )}
 
-      <SectionFrame styleConfig={section.style}>
+      <SectionFrame styleConfig={section.style} className="flex-1">
         {children}
       </SectionFrame>
     </div>

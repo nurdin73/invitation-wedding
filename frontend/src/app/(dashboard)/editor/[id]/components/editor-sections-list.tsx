@@ -141,7 +141,6 @@ export const EditorSectionsList: React.FC<EditorSectionsListProps> = ({ onOpenAd
 
   const handleSelectSection = (id: string) => {
     setActiveSection(id);
-    setActiveTab('inspector');
   };
 
   const sensors = useSensors(

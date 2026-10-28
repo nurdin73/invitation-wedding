@@ -24,6 +24,8 @@ interface EditorState {
   activeTab: EditorTab;
   viewportMode: ViewportMode;
   isLeftPanelCollapsed: boolean;
+  isRightPanelOpen: boolean;
+  autoSaveStatus: 'idle' | 'saving' | 'saved' | 'error';
   isDirty: boolean;
   isSaving: boolean;
   isPublishing: boolean;
@@ -35,6 +37,9 @@ interface EditorState {
   setViewportMode: (mode: ViewportMode) => void;
   toggleLeftPanel: () => void;
   setLeftPanelCollapsed: (collapsed: boolean) => void;
+  setRightPanelOpen: (open: boolean) => void;
+  toggleRightPanel: () => void;
+  setAutoSaveStatus: (status: 'idle' | 'saving' | 'saved' | 'error') => void;
 
   // Content actions
   updateContent: (patch: Partial<InvitationContent>) => void;
@@ -189,6 +194,8 @@ export const useInvitationEditorStore = create<EditorState>((set, get) => ({
   activeTab: 'content',
   viewportMode: 'mobile',
   isLeftPanelCollapsed: false,
+  isRightPanelOpen: false,
+  autoSaveStatus: 'idle',
   isDirty: false,
   isSaving: false,
   isPublishing: false,
@@ -233,6 +240,8 @@ export const useInvitationEditorStore = create<EditorState>((set, get) => ({
       themeConfig: currentTheme,
       activeSectionId: rawSections[0]?.id || null,
       activeTab: 'content',
+      isRightPanelOpen: false,
+      autoSaveStatus: 'idle',
       isDirty: false,
       isSaving: false,
       isPublishing: false,
@@ -240,10 +249,10 @@ export const useInvitationEditorStore = create<EditorState>((set, get) => ({
   },
 
   setActiveSection: (id: string | null) => {
-    set((state) => ({
+    set({
       activeSectionId: id,
-      activeTab: id ? 'inspector' : state.activeTab,
-    }));
+      isRightPanelOpen: id !== null,
+    });
   },
 
   setActiveTab: (activeTab: EditorTab) => {
@@ -260,6 +269,18 @@ export const useInvitationEditorStore = create<EditorState>((set, get) => ({
 
   setLeftPanelCollapsed: (isLeftPanelCollapsed: boolean) => {
     set({ isLeftPanelCollapsed });
+  },
+
+  setRightPanelOpen: (isRightPanelOpen: boolean) => {
+    set({ isRightPanelOpen });
+  },
+
+  toggleRightPanel: () => {
+    set((state) => ({ isRightPanelOpen: !state.isRightPanelOpen }));
+  },
+
+  setAutoSaveStatus: (autoSaveStatus: 'idle' | 'saving' | 'saved' | 'error') => {
+    set({ autoSaveStatus });
   },
 
   // Content Handlers
@@ -364,7 +385,7 @@ export const useInvitationEditorStore = create<EditorState>((set, get) => ({
       return {
         sections: nextSections,
         activeSectionId: newId,
-        activeTab: 'inspector',
+        isRightPanelOpen: true,
         isDirty: true,
       };
     });
@@ -428,7 +449,7 @@ export const useInvitationEditorStore = create<EditorState>((set, get) => ({
       return {
         sections: next,
         activeSectionId: duplicated.id,
-        activeTab: 'inspector',
+        isRightPanelOpen: true,
         isDirty: true,
       };
     });

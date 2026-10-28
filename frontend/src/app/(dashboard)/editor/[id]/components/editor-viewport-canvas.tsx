@@ -87,7 +87,6 @@ export const EditorViewportCanvas: React.FC = () => {
                 isLast={index === visibleSections.length - 1}
                 onSelect={(id) => {
                   setActiveSection(id);
-                  setActiveTab('inspector');
                 }}
                 onMoveUp={(id) => moveSection(id, 'up')}
                 onMoveDown={(id) => moveSection(id, 'down')}

@@ -3,14 +3,17 @@
 import * as React from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { Save, Send, Globe, Sparkles } from 'lucide-react';
+import { Save, Send, Globe, Sparkles, Share2, Check } from 'lucide-react';
 import { invitationsApi } from '@/services/api/invitations.api';
 import { billingApi } from '@/services/api/billing.api';
 import { useDashboardHeaderStore } from '@/lib/stores/dashboard-header.store';
 import { useInvitationEditorStore } from '@/lib/stores/invitation-editor.store';
 import { EditorLeftPanel } from './components/editor-left-panel';
 import { EditorViewportCanvas } from './components/editor-viewport-canvas';
+import { EditorRightPanel } from './components/editor-right-panel';
 import { ProUpgradeDialog } from './components/pro/pro-upgrade-dialog';
+import { GuestLinkGeneratorModal } from './components/guest-link-generator-modal';
+import { useEditorAutosave } from './hooks/use-editor-autosave';
 
 export default function EditorPage() {
   const params = useParams();
@@ -18,6 +21,7 @@ export default function EditorPage() {
   const invitationId = params.id as string;
 
   const [isLoading, setIsLoading] = React.useState(true);
+  const [isGuestLinkModalOpen, setIsGuestLinkModalOpen] = React.useState(false);
 
   const invitation = useInvitationEditorStore((s) => s.invitation);
   const content = useInvitationEditorStore((s) => s.content);
@@ -26,6 +30,7 @@ export default function EditorPage() {
   const isSaving = useInvitationEditorStore((s) => s.isSaving);
   const isPublishing = useInvitationEditorStore((s) => s.isPublishing);
   const isDirty = useInvitationEditorStore((s) => s.isDirty);
+  const autoSaveStatus = useInvitationEditorStore((s) => s.autoSaveStatus);
   const isPro = useInvitationEditorStore((s) => s.isPro);
   const setSubscription = useInvitationEditorStore((s) => s.setSubscription);
   const setUpgradeModalOpen = useInvitationEditorStore((s) => s.setUpgradeModalOpen);
@@ -37,11 +42,13 @@ export default function EditorPage() {
   const setHeader = useDashboardHeaderStore((s) => s.setHeader);
   const resetHeader = useDashboardHeaderStore((s) => s.resetHeader);
 
+  // Aktifkan sinkronisasi debounced autosave (1000ms)
+  useEditorAutosave(invitationId);
+
   // 1. Inisialisasi data undangan & status langganan
   React.useEffect(() => {
     let isMounted = true;
 
-    // Ambil status langganan pengguna
     billingApi
       .getSubscription()
       .then((subRes) => {
@@ -73,7 +80,7 @@ export default function EditorPage() {
     };
   }, [invitationId, initEditor, setSubscription, router]);
 
-  // 2. Action: Simpan Draft
+  // 2. Action: Simpan Draft Manual
   const handleSaveDraft = React.useCallback(async () => {
     if (!invitation) return;
     setSaving(true);
@@ -119,6 +126,15 @@ export default function EditorPage() {
   React.useEffect(() => {
     if (!invitation) return;
 
+    let saveLabel = 'Simpan Draft';
+    let saveIcon = Save;
+    if (autoSaveStatus === 'saving' || isSaving) {
+      saveLabel = 'Menyimpan...';
+    } else if (autoSaveStatus === 'saved') {
+      saveLabel = 'Tersimpan Otomatis';
+      saveIcon = Check;
+    }
+
     setHeader({
       title: `${invitation.title}${isDirty ? ' (Belum Disimpan)' : ''}`,
       breadcrumbs: [
@@ -148,8 +164,8 @@ export default function EditorPage() {
           type: 'button',
           button: {
             id: 'editor-save-draft',
-            label: isSaving ? 'Menyimpan...' : 'Simpan Draft',
-            icon: Save,
+            label: saveLabel,
+            icon: saveIcon,
             variant: isDirty ? 'default' : 'outline',
             disabled: isSaving,
             onClick: handleSaveDraft,
@@ -176,11 +192,18 @@ export default function EditorPage() {
           type: 'dropdown',
           dropdown: {
             id: 'editor-options',
-            triggerLabel: 'Tampilan Tamu',
+            triggerLabel: 'Bagikan & Tamu',
             items: [
               {
+                id: 'share-guest-modal',
+                label: 'Buat Tautan Tamu Personal',
+                icon: Share2,
+                disabled: !invitation.isPublished,
+                onClick: () => setIsGuestLinkModalOpen(true),
+              },
+              {
                 id: 'preview-guest',
-                label: 'Buka Halaman Tamu',
+                label: 'Buka Halaman Tamu Langsung',
                 icon: Globe,
                 disabled: !invitation.isPublished,
                 onClick: () => {
@@ -196,11 +219,23 @@ export default function EditorPage() {
     return () => {
       resetHeader();
     };
-  }, [invitation, isDirty, isSaving, isPublishing, isPro, handleSaveDraft, handleTogglePublish, setHeader, resetHeader, setUpgradeModalOpen]);
+  }, [
+    invitation,
+    isDirty,
+    isSaving,
+    autoSaveStatus,
+    isPublishing,
+    isPro,
+    handleSaveDraft,
+    handleTogglePublish,
+    setHeader,
+    resetHeader,
+    setUpgradeModalOpen,
+  ]);
 
   if (isLoading || !invitation) {
     return (
-      <div className="flex h-[75vh] items-center justify-center text-xs text-muted-foreground">
+      <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">
         Memuat editor kanvas undangan...
       </div>
     );
@@ -209,13 +244,20 @@ export default function EditorPage() {
   return (
     <>
       <div
-        className="flex flex-col lg:flex-row h-[calc(100vh-7.5rem)] w-full rounded-xl border border-border overflow-hidden bg-background shadow-xs"
+        className="flex flex-col lg:flex-row h-full w-full flex-1 min-h-0 overflow-hidden bg-background relative"
         data-testid="editor-page-orchestrator"
       >
         <EditorLeftPanel />
         <EditorViewportCanvas />
+        <EditorRightPanel />
       </div>
       <ProUpgradeDialog />
+      <GuestLinkGeneratorModal
+        isOpen={isGuestLinkModalOpen}
+        onClose={() => setIsGuestLinkModalOpen(false)}
+        slug={invitation.slug}
+        title={invitation.title}
+      />
     </>
   );
 }

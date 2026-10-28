@@ -4,6 +4,7 @@ import * as React from 'react';
 import { useInvitationEditorStore } from '@/lib/stores/invitation-editor.store';
 import { Image as ImageIcon, Plus, Trash2, UploadCloud, Loader2, Sparkles } from 'lucide-react';
 import { mediaApi } from '@/services/api/media.api';
+import { compressImageToWebP } from '@/lib/image-compressor';
 import { toast } from 'sonner';
 
 export const GalleryForm: React.FC = () => {
@@ -45,17 +46,20 @@ export const GalleryForm: React.FC = () => {
     try {
       for (let i = 0; i < filesToUpload.length; i++) {
         const file = filesToUpload[i];
+        // 1. Kompresi gambar client-side ke WebP (maks 1920px, < 400KB)
+        const optimizedFile = await compressImageToWebP(file);
+
         const ticketRes = await mediaApi.getPresignedUrl(
-          file.name,
-          file.type || 'image/jpeg',
-          file.size
+          optimizedFile.name,
+          optimizedFile.type,
+          optimizedFile.size
         );
 
         if (ticketRes.data?.uploadUrl) {
           await mediaApi.uploadDirectToStorage(
             ticketRes.data.uploadUrl,
-            file,
-            file.type || 'image/jpeg'
+            optimizedFile,
+            optimizedFile.type
           );
           newItems.push({
             id: `img-${Date.now().toString(36)}-${i}`,

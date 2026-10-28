@@ -4,6 +4,7 @@ import * as React from 'react';
 import { useInvitationEditorStore } from '@/lib/stores/invitation-editor.store';
 import { User, AtSign, UploadCloud, Loader2 } from 'lucide-react';
 import { mediaApi } from '@/services/api/media.api';
+import { compressImageToWebP } from '@/lib/image-compressor';
 import { toast } from 'sonner';
 
 export const CoupleForm: React.FC = () => {
@@ -24,10 +25,13 @@ export const CoupleForm: React.FC = () => {
 
     setUploading(true);
     try {
+      // 1. Kompresi gambar client-side ke WebP (maks 1920px, < 400KB)
+      const optimizedFile = await compressImageToWebP(file);
+
       const ticketRes = await mediaApi.getPresignedUrl(
-        file.name,
-        file.type || 'image/jpeg',
-        file.size
+        optimizedFile.name,
+        optimizedFile.type,
+        optimizedFile.size
       );
 
       if (!ticketRes.data?.uploadUrl) {
@@ -36,8 +40,8 @@ export const CoupleForm: React.FC = () => {
 
       await mediaApi.uploadDirectToStorage(
         ticketRes.data.uploadUrl,
-        file,
-        file.type || 'image/jpeg'
+        optimizedFile,
+        optimizedFile.type
       );
 
       const uploadedUrl = ticketRes.data.fileUrl;

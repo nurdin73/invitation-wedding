@@ -24,7 +24,7 @@ export const GallerySlider: React.FC<SectionRenderProps<'gallery'>> = ({
   return (
     <section
       data-testid="section-gallery-slider"
-      className="relative w-full py-16 sm:py-20 md:py-24 px-6 text-center space-y-8 flex flex-col justify-center items-center min-h-[60vh]"
+      className="relative w-full py-16 sm:py-20 md:py-24 px-6 text-center space-y-8 flex flex-col justify-center items-center min-h-[100dvh] min-h-screen"
       style={{
         backgroundColor: 'var(--inv-bg, #FAF8F5)',
         color: 'var(--inv-font-body, #3A302C)',

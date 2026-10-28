@@ -25,7 +25,7 @@ export const StoryTimeline: React.FC<SectionRenderProps<'story'>> = ({
   return (
     <section
       data-testid="section-story-timeline"
-      className="relative w-full py-12 sm:py-20 md:py-24 px-4 sm:px-6 text-center space-y-6 sm:space-y-8 flex flex-col justify-center items-center"
+      className="relative w-full py-12 sm:py-20 md:py-24 px-4 sm:px-6 text-center space-y-6 sm:space-y-8 flex flex-col justify-center items-center min-h-[100dvh] min-h-screen"
       style={{
         backgroundColor: 'var(--inv-bg, #FAF8F5)',
         color: 'var(--inv-font-body, #3A302C)',

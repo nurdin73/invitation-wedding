@@ -81,7 +81,10 @@ export const SectionFrame: React.FC<SectionFrameProps> = ({
 
   return (
     <div
-      className={cn('relative w-full overflow-hidden transition-all duration-300', className)}
+      className={cn(
+        'relative w-full min-h-[100dvh] min-h-screen flex flex-col justify-center overflow-hidden transition-all duration-300',
+        className
+      )}
       style={
         hasBgImage
           ? ({
@@ -141,7 +144,7 @@ export const SectionFrame: React.FC<SectionFrameProps> = ({
       )}
 
       {/* 3. Section Content Node */}
-      <div className="relative z-10 w-full">{children}</div>
+      <div className="relative z-10 w-full flex-1 flex flex-col justify-center">{children}</div>
     </div>
   );
 };
